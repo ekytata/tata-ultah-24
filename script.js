@@ -34,6 +34,16 @@ const FLEE_LINES = [
   'Wkwk gigih banget sih kamu 😹',
 ];
 
+const NGAMBEK_AFTER = 5; // pencet "Tidak" segini kali -> halaman ngambek
+
+const MOO_LINES = [
+  'Mooo~ 🐮',
+  'Moooooo!! 💢',
+  'Mbee— eh salah, Mooo 🐄',
+  'Moo? Kok kamu gitu? 😤',
+  'MOOOO!!! 🐮💨',
+];
+
 // ====== HELPERS ======
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 
@@ -81,9 +91,14 @@ function burstAt(x, y, count = 30) {
   }
 }
 
+const AMBIENT_GLYPHS = {
+  love: ['💗', '💕', '✨', '💫'],
+  fire: ['🔥', '🔥', '🔥', '💢'],
+};
+
 function spawnAmbientHearts(count = 25) {
   const container = $('#floating-hearts');
-  const glyphs = ['💗', '💕', '✨', '💫'];
+  const glyphs = AMBIENT_GLYPHS.love;
   for (let i = 0; i < count; i++) {
     const el = document.createElement('span');
     el.className = 'floating-heart';
@@ -94,6 +109,19 @@ function spawnAmbientHearts(count = 25) {
     el.style.animationDelay = (Math.random() * 10) + 's';
     container.appendChild(el);
   }
+}
+
+let bgSetMood = null; // diisi oleh initBackground3D
+
+// 'love' -> hati pink; 'fire' -> api (dipakai di halaman ngambek)
+function setAmbientMood(mode) {
+  const container = $('#floating-hearts');
+  container.classList.toggle('fire', mode === 'fire');
+  const glyphs = AMBIENT_GLYPHS[mode] || AMBIENT_GLYPHS.love;
+  container.querySelectorAll('.floating-heart').forEach((el) => {
+    el.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+  });
+  if (bgSetMood) bgSetMood(mode);
 }
 
 // ====== PASSWORD SCREEN ======
@@ -119,6 +147,57 @@ function initPasswordScreen() {
   });
 }
 
+// ====== NGAMBEK SCREEN ======
+function placeCowRandom(cow) {
+  cow.style.left = (4 + Math.random() * 76) + '%';
+  cow.style.top = (6 + Math.random() * 72) + '%';
+  cow.style.setProperty('--rot', (Math.random() * 50 - 25).toFixed(0) + 'deg');
+  cow.style.setProperty('--sx', Math.random() < 0.5 ? '-1' : '1');
+}
+
+function spawnCows() {
+  const field = $('#cow-field');
+  field.innerHTML = '';
+  const count = 1 + Math.floor(Math.random() * 5); // 1-5 ekor sapi
+
+  // acak urutan sapi-1..sapi-5 lalu ambil sebanyak count, biar gak ada yang dobel
+  const ids = [1, 2, 3, 4, 5].sort(() => Math.random() - 0.5).slice(0, count);
+
+  ids.forEach((id, i) => {
+    const cow = document.createElement('img');
+    cow.className = 'cow';
+    cow.src = `images/sapi-${id}.jpg`;
+    cow.alt = 'sapi ngambek 🐄';
+    cow.draggable = false;
+    cow.style.setProperty('--size', Math.round(95 + Math.random() * 85) + 'px');
+    cow.style.setProperty('--delay', (i * 0.16).toFixed(2) + 's');
+    placeCowRandom(cow);
+
+    cow.addEventListener('pointerdown', () => {
+      if (cow.classList.contains('fading')) return;
+
+      const moo = document.createElement('span');
+      moo.className = 'moo-pop';
+      moo.textContent = MOO_LINES[Math.floor(Math.random() * MOO_LINES.length)];
+      moo.style.left = cow.style.left;
+      moo.style.top = cow.style.top;
+      field.appendChild(moo);
+      moo.addEventListener('animationend', () => moo.remove());
+
+      // memudar, hilang, lalu muncul lagi di tempat lain setelah 2 detik
+      cow.classList.add('fading');
+      setTimeout(() => {
+        placeCowRandom(cow);
+        cow.style.setProperty('--delay', '0s');
+        cow.classList.remove('fading'); // animasi pop + wiggle jalan lagi dari awal
+        void cow.offsetWidth;
+      }, 500);
+    });
+
+    field.appendChild(cow);
+  });
+}
+
 // ====== QUESTION SCREEN ======
 function initQuestionScreen() {
   const zone = $('#button-zone');
@@ -126,8 +205,35 @@ function initQuestionScreen() {
   const btnYes = $('#btn-yes');
   const bubble = $('#flee-bubble');
   let fleeCount = 0;
+  let noTries = 0;
+  let lastFlee = 0;
+
+  function resetNoButton() {
+    btnNo.classList.remove('fleeing');
+    btnNo.style.left = '';
+    btnNo.style.top = '';
+    btnNo.style.transform = '';
+    btnYes.style.transform = '';
+    bubble.classList.remove('show');
+    fleeCount = 0;
+    noTries = 0;
+  }
 
   function flee() {
+    // pointerenter + touchstart bisa dobel dalam satu tap; hitung sekali saja
+    const now = performance.now();
+    if (now - lastFlee < 150) return;
+    lastFlee = now;
+
+    noTries++;
+    if (noTries === NGAMBEK_AFTER) {
+      setTimeout(() => {
+        spawnCows();
+        setAmbientMood('fire');
+        showSection('screen-ngambek');
+      }, 700);
+    }
+
     btnNo.classList.add('fleeing');
 
     const zoneRect = zone.getBoundingClientRect();
@@ -193,6 +299,13 @@ function initQuestionScreen() {
     const rect = btnYes.getBoundingClientRect();
     burstAt(rect.left + rect.width / 2, rect.top + rect.height / 2, 34);
     setTimeout(() => showSection('screen-gallery'), 500);
+  });
+
+  $('#btn-sorry').addEventListener('click', (e) => {
+    burstAt(e.clientX || window.innerWidth / 2, e.clientY || window.innerHeight / 2, 22);
+    resetNoButton();
+    setAmbientMood('love'); // udah baikan, apinya padam
+    setTimeout(() => showSection('screen-question'), 350);
   });
 }
 
@@ -270,6 +383,22 @@ function createHeartTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
+function createFlameTexture() {
+  const size = 64;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.moveTo(size / 2, 3);
+  ctx.bezierCurveTo(size * 0.88, size * 0.38, size * 0.82, size * 0.68, size / 2, size * 0.97);
+  ctx.bezierCurveTo(size * 0.18, size * 0.68, size * 0.12, size * 0.38, size / 2, 3);
+  ctx.closePath();
+  ctx.fill();
+  return new THREE.CanvasTexture(canvas);
+}
+
 function initBackground3D() {
   if (typeof THREE === 'undefined') return;
 
@@ -283,24 +412,34 @@ function initBackground3D() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   container.appendChild(renderer.domElement);
 
-  const texture = createHeartTexture();
-  const colors = [0xff6fa5, 0xffb199, 0xd291ff, 0xffe0ec];
-  const materials = colors.map(
-    (c) => new THREE.SpriteMaterial({ map: texture, color: c, transparent: true, opacity: 0.85, depthWrite: false })
-  );
+  const makeMats = (tex, cols) =>
+    cols.map((c) => new THREE.SpriteMaterial({ map: tex, color: c, transparent: true, opacity: 0.85, depthWrite: false }));
+  const loveMaterials = makeMats(createHeartTexture(), [0xff6fa5, 0xffb199, 0xd291ff, 0xffe0ec]);
+  const fireMaterials = makeMats(createFlameTexture(), [0xff4500, 0xff8c00, 0xffc107, 0xff2d00]);
 
   const hearts = [];
+  let speedMul = 1;
   const count = window.innerWidth < 700 ? 45 : 100;
   for (let i = 0; i < count; i++) {
-    const sprite = new THREE.Sprite(materials[i % materials.length]);
+    const sprite = new THREE.Sprite(loveMaterials[i % loveMaterials.length]);
     sprite.position.set((Math.random() - 0.5) * 800, (Math.random() - 0.5) * 640, (Math.random() - 0.5) * 400);
     const scale = 8 + Math.random() * 20;
     sprite.scale.set(scale, scale, 1);
     sprite.userData.speed = 0.15 + Math.random() * 0.4;
     sprite.userData.driftX = (Math.random() - 0.5) * 0.15;
+    sprite.userData.mi = i % loveMaterials.length;
     scene.add(sprite);
     hearts.push(sprite);
   }
+
+  // dipanggil setAmbientMood: tukar hati <-> api + api naiknya lebih cepat
+  bgSetMood = (mode) => {
+    const mats = mode === 'fire' ? fireMaterials : loveMaterials;
+    speedMul = mode === 'fire' ? 2.4 : 1;
+    hearts.forEach((h) => {
+      h.material = mats[h.userData.mi];
+    });
+  };
 
   let mouseX = 0;
   let mouseY = 0;
@@ -317,7 +456,7 @@ function initBackground3D() {
   function animate() {
     requestAnimationFrame(animate);
     hearts.forEach((h) => {
-      h.position.y += h.userData.speed;
+      h.position.y += h.userData.speed * speedMul;
       h.position.x += h.userData.driftX;
       if (h.position.y > 320) h.position.y = -320;
     });
@@ -334,6 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
   spawnAmbientHearts(22);
   attachTilt($('#password-card'), 10);
   attachTilt($('#question-card'), 10);
+  attachTilt($('#ngambek-card'), 10);
   attachTilt($('#message-card'), 8);
 
   initPasswordScreen();

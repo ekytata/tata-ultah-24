@@ -58,6 +58,11 @@ body {
   filter: drop-shadow(0 0 6px rgba(255, 111, 165, 0.5));
 }
 
+/* mode ngambek: love berubah jadi api */
+#floating-hearts.fire .floating-heart {
+  filter: drop-shadow(0 0 9px rgba(255, 130, 30, 0.8));
+}
+
 @keyframes floatUp {
   0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
   10%  { opacity: 0.8; }
@@ -318,6 +323,92 @@ body {
   font-size: 0.78rem;
   opacity: 0.6;
   margin-top: 0.6rem;
+}
+
+/* ---------- NGAMBEK ---------- */
+
+#cow-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2; /* sapi di depan kartu */
+}
+
+#ngambek-card {
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+}
+
+.ngambek-emoji {
+  font-size: 3.4rem;
+  animation: angryShake 0.7s ease-in-out infinite;
+}
+
+@keyframes angryShake {
+  0%, 100% { transform: rotate(-8deg) translateX(-2px); }
+  50%      { transform: rotate(8deg) translateX(2px); }
+}
+
+.cow {
+  position: absolute;
+  width: min(var(--size, 130px), 36vw);
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 4px solid #fff;
+  border-radius: 18px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  animation:
+    cowPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) var(--delay, 0s) backwards,
+    cowWiggle 1.6s ease-in-out calc(var(--delay, 0s) + 0.55s) infinite alternate;
+}
+
+@keyframes cowPop {
+  from { transform: scale(0) rotate(var(--rot, 0deg)); opacity: 0; }
+  to   { transform: scaleX(var(--sx, 1)) rotate(var(--rot, 0deg)); opacity: 1; }
+}
+
+@keyframes cowWiggle {
+  from { transform: scaleX(var(--sx, 1)) rotate(calc(var(--rot, 0deg) - 7deg)) translateY(0); }
+  to   { transform: scaleX(var(--sx, 1)) rotate(calc(var(--rot, 0deg) + 7deg)) translateY(-10px); }
+}
+
+.cow.fading {
+  animation: cowFade 0.55s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes cowFade {
+  to {
+    opacity: 0;
+    transform: scale(0.15) rotate(calc(var(--rot, 0deg) + 50deg)) translateY(20px);
+  }
+}
+
+.moo-pop {
+  position: absolute;
+  z-index: 2;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 12px;
+  border-radius: 12px;
+  pointer-events: none;
+  white-space: nowrap;
+  transform: translate(-50%, -100%);
+  animation: mooFloat 1s ease-out forwards;
+}
+
+@keyframes mooFloat {
+  from { opacity: 1; transform: translate(-50%, -100%); }
+  to   { opacity: 0; transform: translate(-50%, -220%) rotate(8deg); }
 }
 
 /* ---------- GALLERY ---------- */
