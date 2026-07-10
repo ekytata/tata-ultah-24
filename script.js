@@ -281,6 +281,8 @@ function initQuestionScreen() {
     btnYes.style.transform = `scale(${(1 + fleeCount * 0.025).toFixed(3)})`;
   }
 
+  resetQuestionState = resetNoButton; // dipakai tombol "Balikan yuk" di memory game
+
   btnNo.addEventListener('pointerenter', flee);
   btnNo.addEventListener('click', (e) => {
     e.preventDefault();
@@ -301,10 +303,92 @@ function initQuestionScreen() {
     setTimeout(() => showSection('screen-gallery'), 500);
   });
 
-  $('#btn-sorry').addEventListener('click', (e) => {
-    burstAt(e.clientX || window.innerWidth / 2, e.clientY || window.innerHeight / 2, 22);
-    resetNoButton();
-    setAmbientMood('love'); // udah baikan, apinya padam
+}
+
+// ====== MEMORY GAME (syarat biar dimaafin) ======
+let resetQuestionState = null; // diisi initQuestionScreen
+
+function initMemoryGame() {
+  const grid = $('#memory-grid');
+  const status = $('#memory-status');
+  const winBox = $('#memory-win');
+  let first = null;
+  let lock = false;
+  let matched = 0;
+
+  function buildBoard() {
+    grid.innerHTML = '';
+    winBox.classList.add('hidden');
+    first = null;
+    lock = false;
+    matched = 0;
+    status.textContent = 'Pasangan: 0/5';
+
+    // 5 sapi x 2 kartu, dikocok
+    const deck = [1, 2, 3, 4, 5, 1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
+    deck.forEach((id) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'mem-card';
+      card.dataset.id = id;
+      card.innerHTML = `
+        <span class="mem-inner">
+          <span class="mem-face mem-back">❓</span>
+          <span class="mem-face mem-front"><img src="images/sapi-${id}.jpg" alt="sapi ${id}" draggable="false"></span>
+        </span>`;
+      card.addEventListener('click', () => flip(card));
+      grid.appendChild(card);
+    });
+  }
+
+  function flip(card) {
+    if (lock || card.classList.contains('flipped')) return;
+    card.classList.add('flipped');
+
+    if (!first) {
+      first = card;
+      return;
+    }
+
+    const a = first;
+    const b = card;
+    first = null;
+
+    if (a.dataset.id === b.dataset.id) {
+      a.classList.add('matched');
+      b.classList.add('matched');
+      matched++;
+      status.textContent = `Pasangan: ${matched}/5`;
+      const rect = b.getBoundingClientRect();
+      burstAt(rect.left + rect.width / 2, rect.top + rect.height / 2, 10);
+      if (matched === 5) {
+        setTimeout(() => {
+          winBox.classList.remove('hidden');
+          winBox.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          burstAt(window.innerWidth / 2, window.innerHeight / 2, 45);
+        }, 650);
+      }
+    } else {
+      lock = true;
+      setTimeout(() => {
+        a.classList.remove('flipped');
+        b.classList.remove('flipped');
+        lock = false;
+      }, 850);
+    }
+  }
+
+  // dari halaman ngambek -> harus main dulu
+  $('#btn-sorry').addEventListener('click', () => {
+    buildBoard();
+    showSection('screen-memory');
+  });
+
+  // menang -> dimaafin -> apinya padam -> balik ke pertanyaan
+  $('#btn-forgiven').addEventListener('click', (e) => {
+    burstAt(e.clientX || window.innerWidth / 2, e.clientY || window.innerHeight / 2, 26);
+    if (resetQuestionState) resetQuestionState();
+    setAmbientMood('love');
     setTimeout(() => showSection('screen-question'), 350);
   });
 }
@@ -478,6 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initPasswordScreen();
   initQuestionScreen();
+  initMemoryGame();
   initGalleryScreen();
   initReplay();
 
