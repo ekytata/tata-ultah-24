@@ -50,6 +50,8 @@ const $ = (sel, ctx = document) => ctx.querySelector(sel);
 function showSection(id) {
   document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
   $('#' + id).classList.add('active');
+  // kolase background cuma tampil di halaman memories
+  $('#gallery-bg').classList.toggle('show', id === 'screen-gallery');
 }
 
 const FINE_POINTER = window.matchMedia('(pointer: fine)').matches;
@@ -393,6 +395,68 @@ function initMemoryGame() {
   });
 }
 
+// ====== GALLERY BACKGROUND COLLAGE ======
+const BG_GRADIENTS = [
+  'linear-gradient(135deg,#ffafbd,#ffc3a0)',
+  'linear-gradient(135deg,#a18cd1,#fbc2eb)',
+  'linear-gradient(135deg,#ff9a9e,#fecfef)',
+  'linear-gradient(135deg,#f6d365,#fda085)',
+  'linear-gradient(135deg,#84fab0,#8fd3f4)',
+  'linear-gradient(135deg,#d4a5ff,#ff9ecb)',
+  'linear-gradient(135deg,#ee9ca7,#ffdde1)',
+  'linear-gradient(135deg,#89f7fe,#66a6ff)',
+];
+
+const BG_DARK_GRADIENTS = [
+  'linear-gradient(135deg,#5f2c82,#af4261)',
+  'linear-gradient(135deg,#2b5876,#4e4376)',
+  'linear-gradient(135deg,#c33764,#5b2c6f)',
+];
+
+const BG_EMOJIS = ['💑', '🌅', '🎡', '🍦', '🎬', '🌊', '🌸', '☕', '🎶', '🚲', '🌙', '⭐', '🏖️', '🎠', '📷', '🥰', '🫶', '💐', '🍰', '🎈'];
+const BG_WORDS = ['Love ♡', 'Memories', 'Us ✨', 'Forever', 'Sayang', 'Happy 24th', 'N ♡ S', 'Celebrate Love'];
+
+function buildGalleryBackground() {
+  const track = $('#gallery-bg-track');
+  const colWidths = [210, 170, 250, 190, 230, 180];
+  const targetWidth = Math.max(window.innerWidth, 900) * 1.3;
+
+  const cols = [];
+  let width = 0;
+  let wordIdx = 0;
+
+  for (let i = 0; width < targetWidth || i < 8; i++) {
+    const w = colWidths[i % colWidths.length];
+    width += w + 6; // + margin antar kolom
+    const col = document.createElement('div');
+    col.className = 'bg-col';
+    col.style.width = w + 'px';
+
+    const tiles = 2 + (i % 2); // selang-seling 2-3 tile per kolom
+    for (let t = 0; t < tiles; t++) {
+      const tile = document.createElement('div');
+      const isWord = Math.random() < 0.22;
+      tile.className = 'bg-tile' + (isWord ? ' word' : '');
+      tile.style.flexGrow = (0.7 + Math.random()).toFixed(2);
+      if (isWord) {
+        tile.style.background = BG_DARK_GRADIENTS[Math.floor(Math.random() * BG_DARK_GRADIENTS.length)];
+        tile.textContent = BG_WORDS[wordIdx++ % BG_WORDS.length];
+      } else {
+        tile.style.background = BG_GRADIENTS[Math.floor(Math.random() * BG_GRADIENTS.length)];
+        tile.textContent = BG_EMOJIS[Math.floor(Math.random() * BG_EMOJIS.length)];
+      }
+      col.appendChild(tile);
+    }
+    cols.push(col);
+  }
+
+  // dua salinan identik berdampingan -> geser 50% = loop mulus tanpa "lompatan"
+  cols.forEach((c) => track.appendChild(c));
+  cols.forEach((c) => track.appendChild(c.cloneNode(true)));
+
+  track.style.setProperty('--slide-dur', Math.round(width / 22) + 's'); // ~22px per detik
+}
+
 // ====== GALLERY SCREEN ======
 function initGalleryScreen() {
   const grid = $('#gallery-grid');
@@ -555,6 +619,7 @@ function initBackground3D() {
 // ====== INIT ======
 document.addEventListener('DOMContentLoaded', () => {
   spawnAmbientHearts(22);
+  buildGalleryBackground();
   attachTilt($('#password-card'), 10);
   attachTilt($('#question-card'), 10);
   attachTilt($('#ngambek-card'), 10);
