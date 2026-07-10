@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Nurul Sasmitha 🎂</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9D%A4%EF%B8%8F</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="bg-scene"></div>
+  <div id="floating-hearts"></div>
+
+  <main id="app">
+
+    <!-- 1. PASSWORD GATE -->
+    <section id="screen-password" class="screen active">
+      <div class="card tilt-card" id="password-card">
+        <div class="lock-icon">🔒</div>
+        <h1 class="script-title">Untuk Nurul Sasmitha</h1>
+        <p class="subtitle">Halaman ini dikunci khusus buat kamu, sayang 💕</p>
+        <form id="password-form" autocomplete="off">
+          <input type="password" id="password-input" placeholder="Masukkan kata sandi..." autocomplete="off" autofocus>
+          <button type="submit" class="btn btn-yes">Buka 🔓</button>
+        </form>
+        <p class="hint">Hint: nama depan kamu + umur kamu sekarang, tanpa spasi 😉</p>
+        <p class="error-msg" id="password-error">Kata sandinya salah tuh, coba lagi dong~ 🥺</p>
+      </div>
+    </section>
+
+    <!-- 2. QUESTION -->
+    <section id="screen-question" class="screen">
+      <div class="card tilt-card" id="question-card">
+        <h2 class="eyebrow">Sebelum lanjut, jawab dulu ya...</h2>
+        <h1 class="big-question">Apakah kamu sayang sama aku? 🥰</h1>
+        <div class="button-zone" id="button-zone">
+          <button class="btn btn-yes" id="btn-yes">Sangat sayanggg 😍</button>
+          <button class="btn btn-no" id="btn-no">Tidak</button>
+          <span class="flee-bubble" id="flee-bubble"></span>
+        </div>
+        <p class="tiny-note">*tombol satunya emang agak susah dipencet 😹</p>
+      </div>
+    </section>
+
+    <!-- 3. GALLERY -->
+    <section id="screen-gallery" class="screen">
+      <div class="gallery-wrap">
+        <h2 class="script-title">Kumpulan Momen Kita 📸</h2>
+        <p class="subtitle center">(foto asli nyusul ya, ini dummy dulu biar lucu-lucuan 😝)</p>
+        <div class="gallery-grid" id="gallery-grid"></div>
+        <button class="btn btn-next" id="btn-to-messages">Lanjut ke ucapan →</button>
+      </div>
+    </section>
+
+    <!-- 4. MESSAGES -->
+    <section id="screen-messages" class="screen">
+      <div class="card message-card tilt-card" id="message-card">
+        <div id="message-lines"></div>
+        <div id="finale" class="finale hidden">
+          <h1 class="finale-title">Happy 24th Birthday</h1>
+          <h2 class="finale-name">Nurul Sasmitha 🎂🎉</h2>
+          <p class="finale-sign">Dari Sallie, yang sayang kamu selalu 💌</p>
+          <button class="btn btn-replay" id="btn-replay">Ulangi lagi dari awal ↺</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="script.js" defer></script>
+</body>
+</html>
