@@ -68,7 +68,10 @@ function showSection(id) {
   document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
   $('#' + id).classList.add('active');
   // kolase background cuma tampil di halaman memories
-  $('#gallery-bg').classList.toggle('show', id === 'screen-gallery');
+  const isGallery = id === 'screen-gallery';
+  $('#gallery-bg').classList.toggle('show', isGallery);
+  if (isGallery && galleryIdleStart) galleryIdleStart();
+  if (!isGallery && galleryIdleStop) galleryIdleStop();
 }
 
 const FINE_POINTER = window.matchMedia('(pointer: fine)').matches;
@@ -465,6 +468,62 @@ function buildGalleryBackground() {
   track.style.setProperty('--slide-dur', Math.round(width / 22) + 's'); // ~22px per detik
 }
 
+// ====== GALLERY IDLE MODE (3 detik tanpa klik -> konten fadeout, tinggal kolase) ======
+const GALLERY_IDLE_MS = 3000;
+let galleryIdleStart = null; // dipanggil showSection saat masuk gallery
+let galleryIdleStop = null;  // dipanggil showSection saat keluar gallery
+
+function initGalleryIdleMode() {
+  const section = $('#screen-gallery');
+  const bg = $('#gallery-bg');
+  let timer = null;
+  let hidden = false;
+
+  function hideContent() {
+    hidden = true;
+    section.classList.add('idle');
+    bg.classList.add('ambient');
+  }
+
+  function showContent() {
+    hidden = false;
+    section.classList.remove('idle');
+    bg.classList.remove('ambient');
+  }
+
+  function armTimer() {
+    clearTimeout(timer);
+    timer = setTimeout(hideContent, GALLERY_IDLE_MS);
+  }
+
+  galleryIdleStart = () => {
+    showContent();
+    armTimer();
+  };
+
+  galleryIdleStop = () => {
+    clearTimeout(timer);
+    showContent();
+  };
+
+  // klik/tap di mana saja: munculin konten lagi (kalau lagi sembunyi) + reset hitungan
+  section.addEventListener('pointerdown', () => {
+    if (!section.classList.contains('active')) return;
+    if (hidden) showContent();
+    armTimer();
+  });
+
+  // lagi scroll foto = lagi aktif; jangan fadeout di tengah scroll
+  section.addEventListener(
+    'scroll',
+    () => {
+      if (!section.classList.contains('active') || hidden) return;
+      armTimer();
+    },
+    { passive: true }
+  );
+}
+
 // ====== GALLERY SCREEN ======
 function initGalleryScreen() {
   const grid = $('#gallery-grid');
@@ -637,6 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initQuestionScreen();
   initMemoryGame();
   initGalleryScreen();
+  initGalleryIdleMode();
   initReplay();
 
   try {

@@ -587,6 +587,12 @@ body {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(22, 7, 28, 0.86), rgba(22, 7, 28, 0.64) 45%, rgba(22, 7, 28, 0.88));
+  transition: opacity 0.8s ease;
+}
+
+/* mode idle: scrim menipis biar kolasenya kelihatan jelas */
+#gallery-bg.ambient .gallery-bg-scrim {
+  opacity: 0.3;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -601,6 +607,31 @@ body {
   text-align: center;
   position: relative;
   z-index: 1;
+  transition: opacity 0.8s ease;
+}
+
+/* mode idle: konten fadeout, tinggal kolase yang jalan */
+#screen-gallery.idle .gallery-wrap {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.idle-hint {
+  position: absolute;
+  bottom: 1.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.8s ease 0.5s;
+  pointer-events: none;
+  z-index: 1;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+}
+
+#screen-gallery.idle .idle-hint {
+  opacity: 0.75;
 }
 
 .gallery-grid {
