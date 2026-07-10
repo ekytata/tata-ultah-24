@@ -3,14 +3,31 @@ const CONFIG = {
   PASSWORD: 'nurul24', // hint shown on screen: nama depan + umur, tanpa spasi
 };
 
-const GALLERY_DATA = [
-  { emoji: '💑', gradient: 'linear-gradient(135deg,#ffafbd,#ffc3a0)', caption: 'Waktu pertama kali ketemu, dunia langsung berasa lebih cerah ✨' },
-  { emoji: '😂', gradient: 'linear-gradient(135deg,#a18cd1,#fbc2eb)', caption: 'Momen konyol yang bikin kita ketawa sampai sakit perut 😂' },
-  { emoji: '🌇', gradient: 'linear-gradient(135deg,#ff9a9e,#fecfef)', caption: 'Sore itu, jalan berdua sampai lupa waktu buat pulang 🌇' },
-  { emoji: '🥹', gradient: 'linear-gradient(135deg,#f6d365,#fda085)', caption: 'Saat kamu ngambek tapi tetap saja gemesin di mata aku 🥹' },
-  { emoji: '💌', gradient: 'linear-gradient(135deg,#84fab0,#8fd3f4)', caption: 'Waktu kamu bilang sayang duluan, aku baper sampai sekarang 💌' },
-  { emoji: '🫶', gradient: 'linear-gradient(135deg,#d4a5ff,#ff9ecb)', caption: 'Dan dari semua momen itu, kamu tetap jadi favoritku 🫶' },
+// foto: images/gallery-1.jpeg s/d gallery-17.jpeg (urutan caption mengikuti nomor foto)
+const GALLERY_CAPTIONS = [
+  'Awal dari segalanya 💘',
+  'Senyum yang bikin aku jatuh cinta tiap hari 😍',
+  'Berdua aja udah cukup ✨',
+  'Partner makan enak nomor satu 🍜',
+  'Yang paling gemesin sedunia 🥹',
+  'Jalan kaki pun jadi romantis kalau sama kamu 🚶‍♀️🚶',
+  'Ketawa kamu = mood booster aku 😂',
+  'Foto random tapi tetep cakep 📷',
+  'Bareng kamu, waktu suka lupa jalan ⏳',
+  'My favorite view 🌇',
+  'Si paling fotogenic 💅',
+  'Momen kecil yang gak pernah aku lupa 🤍',
+  'Sama kamu semua tempat jadi indah 🌸',
+  'Ini pas kamu lucu banget (kayak biasanya) 😝',
+  'Definisi rumah: kamu 🏡',
+  'Cantiknya konsisten dari dulu ✨',
+  'Dan masih banyak momen yang nunggu kita 💌',
 ];
+
+const GALLERY_DATA = GALLERY_CAPTIONS.map((caption, i) => ({
+  src: `images/gallery-${i + 1}.jpeg`,
+  caption,
+}));
 
 const MESSAGES = [
   'Selamat ulang tahun, Nurul Sasmitha 🎂',
@@ -396,30 +413,22 @@ function initMemoryGame() {
 }
 
 // ====== GALLERY BACKGROUND COLLAGE ======
-const BG_GRADIENTS = [
-  'linear-gradient(135deg,#ffafbd,#ffc3a0)',
-  'linear-gradient(135deg,#a18cd1,#fbc2eb)',
-  'linear-gradient(135deg,#ff9a9e,#fecfef)',
-  'linear-gradient(135deg,#f6d365,#fda085)',
-  'linear-gradient(135deg,#84fab0,#8fd3f4)',
-  'linear-gradient(135deg,#d4a5ff,#ff9ecb)',
-  'linear-gradient(135deg,#ee9ca7,#ffdde1)',
-  'linear-gradient(135deg,#89f7fe,#66a6ff)',
-];
-
 const BG_DARK_GRADIENTS = [
   'linear-gradient(135deg,#5f2c82,#af4261)',
   'linear-gradient(135deg,#2b5876,#4e4376)',
   'linear-gradient(135deg,#c33764,#5b2c6f)',
 ];
 
-const BG_EMOJIS = ['💑', '🌅', '🎡', '🍦', '🎬', '🌊', '🌸', '☕', '🎶', '🚲', '🌙', '⭐', '🏖️', '🎠', '📷', '🥰', '🫶', '💐', '🍰', '🎈'];
 const BG_WORDS = ['Love ♡', 'Memories', 'Us ✨', 'Forever', 'Sayang', 'Happy 24th', 'N ♡ S', 'Celebrate Love'];
 
 function buildGalleryBackground() {
   const track = $('#gallery-bg-track');
   const colWidths = [210, 170, 250, 190, 230, 180];
   const targetWidth = Math.max(window.innerWidth, 900) * 1.3;
+
+  // urutan foto dikocok sekali, lalu dipakai bergilir biar semua 17 foto kebagian
+  const photoOrder = GALLERY_DATA.map((g) => g.src).sort(() => Math.random() - 0.5);
+  let photoIdx = 0;
 
   const cols = [];
   let width = 0;
@@ -435,15 +444,14 @@ function buildGalleryBackground() {
     const tiles = 2 + (i % 2); // selang-seling 2-3 tile per kolom
     for (let t = 0; t < tiles; t++) {
       const tile = document.createElement('div');
-      const isWord = Math.random() < 0.22;
-      tile.className = 'bg-tile' + (isWord ? ' word' : '');
+      const isWord = Math.random() < 0.2;
+      tile.className = 'bg-tile' + (isWord ? ' word' : ' photo');
       tile.style.flexGrow = (0.7 + Math.random()).toFixed(2);
       if (isWord) {
         tile.style.background = BG_DARK_GRADIENTS[Math.floor(Math.random() * BG_DARK_GRADIENTS.length)];
         tile.textContent = BG_WORDS[wordIdx++ % BG_WORDS.length];
       } else {
-        tile.style.background = BG_GRADIENTS[Math.floor(Math.random() * BG_GRADIENTS.length)];
-        tile.textContent = BG_EMOJIS[Math.floor(Math.random() * BG_EMOJIS.length)];
+        tile.style.backgroundImage = `url(${photoOrder[photoIdx++ % photoOrder.length]})`;
       }
       col.appendChild(tile);
     }
@@ -460,11 +468,11 @@ function buildGalleryBackground() {
 // ====== GALLERY SCREEN ======
 function initGalleryScreen() {
   const grid = $('#gallery-grid');
-  GALLERY_DATA.forEach((item) => {
+  GALLERY_DATA.forEach((item, i) => {
     const card = document.createElement('div');
     card.className = 'polaroid';
     card.innerHTML = `
-      <div class="gallery-photo" style="background:${item.gradient}">${item.emoji}</div>
+      <div class="gallery-photo"><img src="${item.src}" alt="momen kita ${i + 1}" loading="lazy" draggable="false"></div>
       <p class="caption">${item.caption}</p>
     `;
     grid.appendChild(card);
