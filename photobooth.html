@@ -136,6 +136,49 @@ body {
 
 .chip-icon { margin-right: 6px; }
 
+.pb-frame-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+}
+
+.pb-frame-card {
+  width: 118px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-radius: 16px;
+  padding: 8px 8px 7px;
+  cursor: pointer;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pb-frame-card:hover { transform: translateY(-3px); }
+
+.pb-frame-card img {
+  width: 100%;
+  display: block;
+  border-radius: 9px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+}
+
+.pb-frame-card span {
+  display: block;
+  margin-top: 7px;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.pb-frame-card.selected {
+  border-color: var(--pink);
+  background: rgba(255, 111, 165, 0.16);
+  box-shadow: 0 0 0 3px rgba(255, 111, 165, 0.4), 0 10px 22px rgba(255, 111, 165, 0.35);
+}
+
 .btn {
   border: none;
   border-radius: 50px;
@@ -186,6 +229,35 @@ body {
   height: 100%;
   object-fit: cover;
   transform: scaleX(-1); /* mirror ala selfie */
+}
+
+#pb-shutter {
+  margin: 0.2rem 0.5rem 0 0;
+  font-size: 1.05rem;
+  padding: 1rem 2.6rem;
+  animation: shutterPulse 1.6s ease-in-out infinite;
+}
+
+#pb-review-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 2;
+}
+
+#pb-review-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0.2rem 0 0.6rem;
+}
+
+@keyframes shutterPulse {
+  0%, 100% { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); }
+  50%      { box-shadow: 0 8px 30px rgba(255, 111, 165, 0.65); }
 }
 
 .pb-countdown {
@@ -244,6 +316,8 @@ body {
   border-radius: 10px;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
 }
+
+#pb-canvas.two { width: min(84vw, 450px); }
 
 .pb-sliders {
   display: grid;
@@ -311,6 +385,14 @@ body {
   margin-top: 1.4rem;
 }
 
+.pb-hint {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  margin: 0.9rem auto 0;
+  max-width: 420px;
+  line-height: 1.5;
+}
+
 .back-link { margin-top: 0.6rem; }
 .back-link a {
   color: rgba(255, 255, 255, 0.75);
@@ -328,6 +410,8 @@ body {
   .pb-actions .btn { width: 100%; }
   .pb-thumb { width: 84px; }
   .pb-sliders label { grid-template-columns: 6rem 1fr 3rem; }
+  .pb-frame-card { width: calc(50% - 0.5rem); max-width: 150px; }
+  #pb-canvas.two { width: 86vw; }
 }
 </style>
 </head>
@@ -343,7 +427,11 @@ body {
   <section class="pb-card" id="step-config">
     <div class="pb-group">
       <h3>Pilih frame 🖼️</h3>
-      <div class="pb-chips" id="pb-frames"></div>
+      <div class="pb-frame-cards" id="pb-frames"></div>
+    </div>
+    <div class="pb-group">
+      <h3>Layout strip 🧩</h3>
+      <div class="pb-chips" id="pb-layouts"></div>
     </div>
     <div class="pb-group">
       <h3>Jumlah foto 🔢</h3>
@@ -361,10 +449,16 @@ body {
   <section class="pb-card hidden" id="step-capture">
     <div class="pb-video-box">
       <video id="pb-video" autoplay playsinline muted></video>
+      <img id="pb-review-img" class="hidden" alt="cek hasil jepretan">
       <div class="pb-countdown" id="pb-countdown"></div>
       <div class="pb-flash" id="pb-flash"></div>
     </div>
     <p class="pb-progress" id="pb-progress"></p>
+    <button class="btn hidden" id="pb-shutter">📸 Jepret!</button>
+    <div id="pb-review-actions" class="hidden">
+      <button class="btn" id="pb-accept">Lanjutkan ➡️</button>
+      <button class="btn ghost" id="pb-redo">🔁 Take Ulang</button>
+    </div>
     <button class="btn ghost" id="pb-cancel">✕ Batal</button>
   </section>
 
@@ -374,6 +468,9 @@ body {
 
     <h3>Ganti frame 🖼️</h3>
     <div class="pb-chips" id="pb-frames-result"></div>
+
+    <h3>Layout 🧩</h3>
+    <div class="pb-chips" id="pb-layouts-result"></div>
 
     <h3>Filter 🎨</h3>
     <div class="pb-chips" id="pb-filters-result"></div>
@@ -400,8 +497,10 @@ body {
     <div class="pb-actions">
       <button class="btn" id="pb-save-png">Simpan PNG ⬇️</button>
       <button class="btn" id="pb-save-jpg">Simpan JPG ⬇️</button>
+      <button class="btn" id="pb-save-gif">Simpan GIF 🎞️</button>
       <button class="btn alt" id="pb-again">Sesi baru 🔄</button>
     </div>
+    <p class="pb-hint">GIF-nya bergerak kayak live photo — diambil dari 5 detik terakhir sebelum tiap jepretan 🎞️</p>
   </section>
 
   <p class="back-link"><a href="index.html">← balik ke website ucapan</a></p>
@@ -413,54 +512,67 @@ const CONFIG = {
   minShots: 3,
   maxShots: 8,
   defaultShots: 4,
-  countdownSeconds: 3,   // hitung mundur tiap foto
-  pauseBetweenShots: 900, // jeda antar foto (ms)
+  countdownSeconds: 3,   // hitung mundur setelah pencet tombol jepret
+  pauseBetweenShots: 500, // jeda setelah flash sebelum lanjut (ms)
   photoWidth: 640,        // resolusi tiap foto di strip (4:3)
   photoHeight: 480,
   fileName: 'photobooth-nurul-24',
   jpgQuality: 0.92,
 
   layout: {
-    pad: 56,        // margin kiri-kanan strip (tempat hiasan)
-    headerH: 112,   // ruang judul di atas
-    footerH: 132,   // ruang tanda tangan di bawah
-    gap: 26,        // jarak antar foto
-    photoBorder: 12 // tebal border putih tiap foto
+    pad: 100,      // margin kiri-kanan foto (ruang doodle)
+    headerH: 150,  // ruang header kecil di atas
+    footerH: 400,  // ruang tanggal + tanda tangan di bawah
+    gap: 36,       // jarak vertikal antar foto
+    gapX: 36       // jarak horizontal antar foto (mode 2 kolom)
   },
 
-  footerText: 'Nurul ♡ Sallie',
-  footerSub: '24th Birthday 🎂',
+  layouts: [
+    { cols: 1, name: 'Strip 1 Kolom', icon: '▮' },
+    { cols: 2, name: 'Grid 2 Kolom', icon: '▮▮' }
+  ],
 
+  // teks di strip (gaya photobooth studio)
+  brandTop: 'PHOTO',
+  brandBottom: 'BOOTH',
+  dateText: '11.07.2026',
+  signature1: 'Happy Birthday Tata',
+  signatureMid: 'by',
+  signature2: 'Pacar Tata',
+
+  // GIF "live photo": ambil N detik terakhir sebelum tiap jepretan
+  gif: {
+    seconds: 5,
+    fps: 8,          // makin tinggi makin mulus
+    frameW: 360,     // resolusi frame live yang direkam
+    frameH: 270,
+    stripWidth: 480, // lebar GIF hasil
+    quality: 6,      // gif.js: makin kecil makin bagus (tapi makin lambat)
+    workers: 4
+  },
+
+  // tema: bg polos lembut + doodle line-art tipis (digambar kurva, bukan emoji)
   frames: [
     {
-      id: 'pink', name: 'Pink Party', icon: '🎀',
-      bgTop: '#ffd9e8', bgBottom: '#ff9ec3', deco: 'none',
-      edgeEmojis: ['🎀', '🎈', '💖', '✨', '🎂'],
-      title: 'Happy Birthday Sayang!',
-      titleColor: '#ad1457', textColor: '#7c1240'
+      id: 'rose', name: 'Classic Rose', icon: '🌹',
+      bg: '#faf5ea', ink: '#c98a8f', inkDark: '#9c5a60',
+      motifs: ['flower', 'leaf', 'heart', 'sparkle']
     },
     {
-      id: 'jerapah', name: 'Jerapah Party', icon: '🦒',
-      bgTop: '#ffedbc', bgBottom: '#ffc95e', deco: 'giraffe',
-      patchColor: 'rgba(186, 111, 34, 0.85)',
-      edgeEmojis: ['🦒', '🌿', '🎉', '☀️'],
-      title: 'Jerapah bilang: Met Ultah!',
-      titleColor: '#8a4b12', textColor: '#6e3c0e'
+      id: 'party', name: 'Party Doodle', icon: '🎈',
+      bg: '#fbf6ee', ink: '#dd9068', inkDark: '#b56a42',
+      motifs: ['balloon', 'star', 'cake', 'sparkle']
     },
     {
-      id: 'confetti', name: 'Confetti Pop', icon: '🎉',
-      bgTop: '#fffdf7', bgBottom: '#fff0d9', deco: 'confetti',
-      edgeEmojis: ['🎉', '🎊', '🥳', '🎁'],
-      title: 'Yeay, 24 Tahun!',
-      titleColor: '#e91e63', textColor: '#5a3a5e'
+      id: 'jerapah', name: 'Jerapah Doodle', icon: '🦒',
+      bg: '#fbf3e2', ink: '#c08a3e', inkDark: '#8f6224',
+      motifs: ['giraffe', 'spot', 'leaf', 'star'],
+      emoji: '🦒' // ikut nongol di pinggir-pinggir frame
     },
     {
-      id: 'sapi', name: 'Sapi Kesayangan', icon: '🐄',
-      bgTop: '#ffffff', bgBottom: '#f1f1f1', deco: 'cow',
-      patchColor: 'rgba(28, 28, 28, 0.9)',
-      edgeEmojis: ['🐄', '🐮', '🌼', '💕'],
-      title: 'Moo-y Birthday!',
-      titleColor: '#2e2e2e', textColor: '#464646'
+      id: 'sapi', name: 'Sapi Doodle', icon: '🐄',
+      bg: '#f7f6f2', ink: '#8a8a8a', inkDark: '#555555',
+      motifs: ['cow', 'spot', 'daisy', 'heart']
     }
   ],
 
@@ -483,11 +595,17 @@ const pb = {
   frame: CONFIG.frames[0],
   filter: CONFIG.filters[0],
   count: CONFIG.defaultShots,
+  cols: CONFIG.layouts[0].cols,
   adjust: { b: 1, c: 1, s: 1 }, // brightness/contrast/saturation (1 = normal)
   shots: [],
+  liveShots: [], // frame "live photo" per slot (N detik terakhir sebelum jepretan)
+  ring: [],      // ring buffer rekaman kamera yang jalan terus
+  recTimer: null,
   stream: null,
   busy: false,
   abort: false,
+  shutterResolve: null, // resolver promise tombol jepret
+  reviewResolve: null,  // resolver promise cek hasil (lanjut/ulang)
 };
 
 // ---------- filter pixel ops (jalan di semua browser, tanpa ctx.filter) ----------
@@ -570,104 +688,401 @@ function mulberry32(seed) {
 
 function randMarginPoint(rnd, W, H, L) {
   const zone = rnd();
-  if (zone < 0.3) return [8 + rnd() * (L.pad - 16), rnd() * H];
-  if (zone < 0.6) return [W - L.pad + 8 + rnd() * (L.pad - 16), rnd() * H];
-  if (zone < 0.8) return [rnd() * W, 10 + rnd() * Math.max(L.headerH - 74, 20)];
-  return [rnd() * W, H - L.footerH + 14 + rnd() * 28];
+  if (zone < 0.3) return [14 + rnd() * (L.pad - 34), L.headerH * 0.6 + rnd() * (H - L.headerH * 0.6 - 90)];
+  if (zone < 0.6) return [W - L.pad + 20 + rnd() * (L.pad - 34), L.headerH * 0.6 + rnd() * (H - L.headerH * 0.6 - 90)];
+  if (zone < 0.82) return [rnd() * W, 16 + rnd() * Math.max(L.headerH - 90, 24)];
+  return [rnd() * W, H - 66 + rnd() * 46];
 }
 
-function drawFrameDecor(ctx, frame, W, H) {
-  const L = CONFIG.layout;
-  const rnd = mulberry32(9137 + frame.id.length * 131 + pb.shots.length * 977);
+// ---------- perpustakaan doodle line-art (semua digambar dengan stroke di titik 0,0) ----------
+const DOODLES = {
+  flower(ctx, s) {
+    const pr = s * 0.3;
+    for (let k = 0; k < 5; k++) {
+      ctx.save();
+      ctx.rotate((k / 5) * Math.PI * 2);
+      ctx.beginPath();
+      ctx.ellipse(0, -pr * 0.75, s * 0.13, s * 0.24, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.beginPath();
+    ctx.arc(0, 0, s * 0.09, 0, Math.PI * 2);
+    ctx.stroke();
+  },
+  daisy(ctx, s) {
+    for (let k = 0; k < 8; k++) {
+      ctx.save();
+      ctx.rotate((k / 8) * Math.PI * 2);
+      ctx.beginPath();
+      ctx.ellipse(0, -s * 0.28, s * 0.08, s * 0.2, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.beginPath();
+    ctx.arc(0, 0, s * 0.08, 0, Math.PI * 2);
+    ctx.stroke();
+  },
+  heart(ctx, s) {
+    const w = s * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(0, w * 0.6);
+    ctx.bezierCurveTo(-w, -w * 0.2, -w * 0.4, -w, 0, -w * 0.35);
+    ctx.bezierCurveTo(w * 0.4, -w, w, -w * 0.2, 0, w * 0.6);
+    ctx.stroke();
+  },
+  sparkle(ctx, s) {
+    const r = s * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(0, -r);
+    ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.quadraticCurveTo(0, 0, 0, r);
+    ctx.quadraticCurveTo(0, 0, -r, 0);
+    ctx.quadraticCurveTo(0, 0, 0, -r);
+    ctx.stroke();
+  },
+  leaf(ctx, s) {
+    const r = s * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.2, r);
+    ctx.quadraticCurveTo(0, 0, r * 0.15, -r);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.28, r * 0.3, r * 0.3, r * 0.13, -0.6, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(r * 0.2, -r * 0.25, r * 0.3, r * 0.13, 0.5, 0, Math.PI * 2);
+    ctx.stroke();
+  },
+  balloon(ctx, s) {
+    const r = s * 0.3;
+    ctx.beginPath();
+    ctx.arc(0, -s * 0.15, r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, -s * 0.15 + r);
+    ctx.quadraticCurveTo(s * 0.12, s * 0.18, -s * 0.05, s * 0.34);
+    ctx.quadraticCurveTo(-s * 0.16, s * 0.46, s * 0.05, s * 0.5);
+    ctx.stroke();
+  },
+  star(ctx, s) {
+    const R = s * 0.5, r2 = R * 0.45;
+    ctx.beginPath();
+    for (let k = 0; k < 10; k++) {
+      const rad = k % 2 === 0 ? R : r2;
+      const a = (Math.PI / 5) * k - Math.PI / 2;
+      const x = Math.cos(a) * rad, y = Math.sin(a) * rad;
+      if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  },
+  cake(ctx, s) {
+    const w = s * 0.72, h = s * 0.56;
+    roundRectPath(ctx, -w / 2, -h * 0.06, w, h * 0.46, 5);
+    ctx.stroke();
+    roundRectPath(ctx, -w * 0.32, -h * 0.4, w * 0.64, h * 0.34, 5);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, -h * 0.4);
+    ctx.lineTo(0, -h * 0.62);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, -h * 0.72, s * 0.05, 0, Math.PI * 2);
+    ctx.stroke();
+  },
+  spot(ctx, s, rnd) {
+    const pts = 7, base = s * 0.4;
+    ctx.beginPath();
+    for (let k = 0; k <= pts; k++) {
+      const a = (k / pts) * Math.PI * 2;
+      const rr = base * (0.72 + (rnd ? rnd() : 0.5) * 0.4);
+      const x = Math.cos(a) * rr, y = Math.sin(a) * rr * 0.82;
+      if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  },
+  giraffe(ctx, s) {
+    const r = s * 0.5;
+    // muka bulat
+    ctx.beginPath(); ctx.ellipse(0, 0, r * 0.46, r * 0.52, 0, 0, Math.PI * 2); ctx.stroke();
+    // moncong + hidung + senyum
+    ctx.beginPath(); ctx.ellipse(0, r * 0.3, r * 0.28, r * 0.18, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(-r * 0.09, r * 0.26, r * 0.025, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(r * 0.09, r * 0.26, r * 0.025, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, r * 0.3, r * 0.11, 0.2 * Math.PI, 0.8 * Math.PI); ctx.stroke();
+    // mata besar terisi biar imut
+    ctx.save();
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.beginPath(); ctx.arc(-r * 0.17, -r * 0.1, r * 0.06, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(r * 0.17, -r * 0.1, r * 0.06, 0, Math.PI * 2); ctx.fill();
+    // pipi merona
+    ctx.globalAlpha *= 0.3;
+    ctx.beginPath(); ctx.arc(-r * 0.32, r * 0.06, r * 0.075, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(r * 0.32, r * 0.06, r * 0.075, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    [-1, 1].forEach((d) => {
+      // ossicone dengan bulatan terisi
+      ctx.beginPath();
+      ctx.moveTo(d * r * 0.16, -r * 0.48);
+      ctx.lineTo(d * r * 0.23, -r * 0.72);
+      ctx.stroke();
+      ctx.save();
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.beginPath(); ctx.arc(d * r * 0.24, -r * 0.78, r * 0.055, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+      // telinga lebar
+      ctx.beginPath();
+      ctx.ellipse(d * r * 0.54, -r * 0.3, r * 0.18, r * 0.1, d * 0.55, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+  },
+  cow(ctx, s) {
+    const r = s * 0.5;
+    ctx.beginPath(); ctx.ellipse(0, -r * 0.08, r * 0.48, r * 0.44, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(0, r * 0.3, r * 0.34, r * 0.22, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(-r * 0.12, r * 0.3, r * 0.04, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(r * 0.12, r * 0.3, r * 0.04, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(-r * 0.2, -r * 0.18, r * 0.05, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(r * 0.2, -r * 0.18, r * 0.05, 0, Math.PI * 2); ctx.stroke();
+    [-1, 1].forEach((d) => {
+      ctx.beginPath();
+      ctx.ellipse(d * r * 0.56, -r * 0.14, r * 0.16, r * 0.09, d * 0.35, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(d * r * 0.3, -r * 0.48);
+      ctx.quadraticCurveTo(d * r * 0.42, -r * 0.72, d * r * 0.22, -r * 0.72);
+      ctx.stroke();
+    });
+  },
+};
 
-  const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, frame.bgTop);
-  g.addColorStop(1, frame.bgBottom);
-  ctx.fillStyle = g;
+function drawMotif(ctx, frame, name, x, y, size, rnd, alpha) {
+  const fn = DOODLES[name];
+  if (!fn) return;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate((rnd() - 0.5) * 0.9);
+  ctx.strokeStyle = frame.ink;
+  ctx.globalAlpha = alpha;
+  ctx.lineWidth = Math.max(2, size * 0.05);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  fn(ctx, size, rnd);
+  ctx.restore();
+}
+
+function roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function stripDims(n, cols) {
+  const { photoWidth: PW, photoHeight: PH, layout: L } = CONFIG;
+  const rows = Math.ceil(n / cols);
+  const W = L.pad * 2 + cols * PW + (cols - 1) * L.gapX;
+  const H = L.headerH + rows * PH + (rows - 1) * L.gap + L.footerH;
+  return { W, H, rows };
+}
+
+function drawDecor(ctx, frame, W, H) {
+  const L = CONFIG.layout;
+  const rnd = mulberry32(9137 + frame.id.length * 131 + W * 3 + H);
+
+  // latar polos lembut
+  ctx.fillStyle = frame.bg;
   ctx.fillRect(0, 0, W, H);
 
-  if (frame.deco === 'giraffe' || frame.deco === 'cow') {
-    ctx.fillStyle = frame.patchColor;
-    const patches = Math.round((W * H) / 26000);
-    for (let i = 0; i < patches; i++) {
-      const [x, y] = randMarginPoint(rnd, W, H, L);
-      const rx = 14 + rnd() * 24;
-      const ry = rx * (0.6 + rnd() * 0.5);
-      ctx.beginPath();
-      ctx.ellipse(x, y, rx, ry, rnd() * Math.PI, 0, Math.PI * 2);
-      ctx.fill();
-    }
+  // ilustrasi besar samar di area tanda tangan (kayak sketsa di referensi)
+  drawMotif(ctx, frame, frame.motifs[0], W * 0.3, H - L.footerH * 0.42, 200, rnd, 0.14);
+  drawMotif(ctx, frame, frame.motifs[1] || frame.motifs[0], W * 0.72, H - L.footerH * 0.6, 150, rnd, 0.12);
+  drawMotif(ctx, frame, frame.motifs[2] || frame.motifs[0], W * 0.55, H - L.footerH * 0.18, 110, rnd, 0.12);
+
+  // doodle kecil menyebar di margin
+  const count = Math.round(H / 140);
+  for (let i = 0; i < count; i++) {
+    const [x, y] = randMarginPoint(rnd, W, H, L);
+    const name = frame.motifs[Math.floor(rnd() * frame.motifs.length)];
+    drawMotif(ctx, frame, name, x, y, 28 + rnd() * 30, rnd, 0.55 + rnd() * 0.25);
   }
 
-  if (frame.deco === 'confetti') {
-    const colors = ['#ff6fa5', '#ffc107', '#4fc3f7', '#81c784', '#b39ddb', '#ff8a65'];
-    const bits = Math.round((W * H) / 9000);
-    for (let i = 0; i < bits; i++) {
-      const [x, y] = randMarginPoint(rnd, W, H, L);
-      ctx.fillStyle = colors[Math.floor(rnd() * colors.length)];
+  // emoji khas tema (mis. jerapah 🦒) di titik-titik manis
+  if (frame.emoji) {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const spots = [
+      [L.pad * 0.5, L.headerH * 0.55, 42, -0.25],
+      [W - L.pad * 0.5, L.headerH * 0.55, 42, 0.25],
+      [W * 0.84, H - L.footerH * 0.3, 56, 0.2],
+      [W * 0.15, H - 44, 38, -0.15],
+    ];
+    spots.forEach(([x, y, size, rot]) => {
       ctx.save();
       ctx.translate(x, y);
-      ctx.rotate(rnd() * Math.PI);
-      if (rnd() < 0.5) ctx.fillRect(-5, -2.5, 10, 5);
-      else { ctx.beginPath(); ctx.arc(0, 0, 3.5 + rnd() * 2.5, 0, Math.PI * 2); ctx.fill(); }
+      ctx.rotate(rot);
+      ctx.font = size + 'px serif';
+      ctx.globalAlpha = 0.95;
+      ctx.fillText(frame.emoji, 0, 0);
+      ctx.restore();
+    });
+    const extra = Math.round(H / 600);
+    for (let i = 0; i < extra; i++) {
+      const [x, y] = randMarginPoint(rnd, W, H, L);
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate((rnd() - 0.5) * 0.6);
+      ctx.font = Math.round(26 + rnd() * 12) + 'px serif';
+      ctx.globalAlpha = 0.85;
+      ctx.fillText(frame.emoji, 0, 0);
       ctx.restore();
     }
   }
-
-  const emojiCount = Math.round(H / 85);
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  for (let i = 0; i < emojiCount; i++) {
-    const em = frame.edgeEmojis[i % frame.edgeEmojis.length];
-    const [x, y] = randMarginPoint(rnd, W, H, L);
-    const size = 24 + rnd() * 18;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate((rnd() - 0.5) * 0.9);
-    ctx.font = size + 'px serif';
-    ctx.fillText(em, 0, 0);
-    ctx.restore();
-  }
 }
 
-async function renderStrip() {
+// letterspacing manual biar konsisten di semua browser
+function drawSpacedText(ctx, text, cx, y, spacing) {
+  const chars = [...text];
+  const widths = chars.map((ch) => ctx.measureText(ch).width);
+  const total = widths.reduce((a, b) => a + b, 0) + spacing * (chars.length - 1);
+  let x = cx - total / 2;
+  chars.forEach((ch, i) => {
+    ctx.fillText(ch, x + widths[i] / 2, y);
+    x += widths[i] + spacing;
+  });
+}
+
+function drawTexts(ctx, frame, W, H) {
+  const L = CONFIG.layout;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = frame.inkDark;
+
+  // header kecil huruf renggang
+  ctx.font = '700 30px Poppins, sans-serif';
+  drawSpacedText(ctx, CONFIG.brandTop, W / 2, L.headerH * 0.42, 9);
+  drawSpacedText(ctx, CONFIG.brandBottom, W / 2, L.headerH * 0.42 + 38, 9);
+
+  // tanggal kecil
+  ctx.font = '600 22px Poppins, sans-serif';
+  ctx.globalAlpha = 0.75;
+  drawSpacedText(ctx, CONFIG.dateText, W / 2, H - L.footerH + 58, 3);
+  ctx.globalAlpha = 1;
+
+  // tanda tangan script besar (mengecil otomatis kalau kepanjangan)
+  const maxW = W - 110;
+  let px = fitScript(ctx, CONFIG.signature1, maxW, 80);
+  ctx.font = `700 ${px}px "Dancing Script", cursive`;
+  ctx.fillText(CONFIG.signature1, W / 2, H - L.footerH + 168);
+  ctx.font = '700 44px "Dancing Script", cursive';
+  ctx.globalAlpha = 0.8;
+  ctx.fillText(CONFIG.signatureMid, W / 2, H - L.footerH + 228);
+  ctx.globalAlpha = 1;
+  px = fitScript(ctx, CONFIG.signature2, maxW, 80);
+  ctx.font = `700 ${px}px "Dancing Script", cursive`;
+  ctx.fillText(CONFIG.signature2, W / 2, H - L.footerH + 310);
+}
+
+function fitScript(ctx, text, maxW, basePx) {
+  let px = basePx;
+  ctx.font = `700 ${px}px "Dancing Script", cursive`;
+  while (px > 34 && ctx.measureText(text).width > maxW) {
+    px -= 3;
+    ctx.font = `700 ${px}px "Dancing Script", cursive`;
+  }
+  return px;
+}
+
+// gambar strip lengkap ke canvas mana pun (dipakai hasil asli & preview frame)
+function drawStripTo(canvas, frame, imgs, cols) {
   const { photoWidth: PW, photoHeight: PH, layout: L } = CONFIG;
-  const n = pb.shots.length;
-  const W = PW + L.pad * 2;
-  const H = L.headerH + n * PH + (n - 1) * L.gap + L.footerH;
-  const canvas = $('#pb-canvas');
+  const n = imgs.length;
+  const { W, H } = stripDims(n, cols);
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  try { await document.fonts.load('700 60px "Dancing Script"'); } catch (e) { /* pakai fallback */ }
+  drawDecor(ctx, frame, W, H);
 
-  drawFrameDecor(ctx, pb.frame, W, H);
+  const rnd2 = mulberry32(517 + n * 31 + cols * 7 + frame.id.length);
 
-  pb.shots.forEach((shot, i) => {
-    if (!shot) return;
-    const x = L.pad;
-    const y = L.headerH + i * (PH + L.gap);
+  imgs.forEach((img, i) => {
+    if (!img) return;
+    const row = Math.floor(i / cols);
+    const col = i % cols;
+    const lastAlone = cols === 2 && i === n - 1 && n % 2 === 1;
+    const x = lastAlone ? (W - PW) / 2 : L.pad + col * (PW + L.gapX);
+    const y = L.headerH + row * (PH + L.gap);
+
+    // foto polos nempel di kertas, sudut sedikit membulat + garis tipis
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.28)';
-    ctx.shadowBlur = 18;
-    ctx.shadowOffsetY = 8;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(x - L.photoBorder, y - L.photoBorder, PW + L.photoBorder * 2, PH + L.photoBorder * 2);
+    roundRectPath(ctx, x, y, PW, PH, 8);
+    ctx.clip();
+    ctx.drawImage(img, x, y, PW, PH);
     ctx.restore();
-    ctx.drawImage(processShot(shot), x, y);
+
+    ctx.save();
+    ctx.strokeStyle = frame.ink;
+    ctx.globalAlpha = 0.22;
+    ctx.lineWidth = 2;
+    roundRectPath(ctx, x + 1, y + 1, PW - 2, PH - 2, 8);
+    ctx.stroke();
+    ctx.restore();
+
+    // doodle nemplok di pojok foto, selang-seling kiri/kanan
+    const motif = frame.motifs[i % frame.motifs.length];
+    const cx = i % 2 === 0 ? x + PW - 12 : x + 14;
+    const cy = i % 2 === 0 ? y + 12 : y + PH - 14;
+    drawMotif(ctx, frame, motif, cx, cy, 46, rnd2, 0.85);
   });
 
+  drawTexts(ctx, frame, W, H);
+}
+
+async function renderStrip() {
+  try { await document.fonts.load('700 60px "Dancing Script"'); } catch (e) { /* pakai fallback */ }
+  const imgs = pb.shots.map((s) => (s ? processShot(s) : null));
+  const canvas = $('#pb-canvas');
+  drawStripTo(canvas, pb.frame, imgs, pb.cols);
+  canvas.classList.toggle('two', pb.cols === 2);
+}
+
+// ---------- preview frame di step config ----------
+const framePreviewSrc = {};
+
+function makePlaceholder(emoji) {
+  const c = document.createElement('canvas');
+  c.width = CONFIG.photoWidth;
+  c.height = CONFIG.photoHeight;
+  const ctx = c.getContext('2d');
+  const g = ctx.createLinearGradient(0, 0, c.width, c.height);
+  g.addColorStop(0, '#f0e4dd');
+  g.addColorStop(1, '#e2d8e8');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.font = '140px serif';
   ctx.textAlign = 'center';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = pb.frame.titleColor;
-  ctx.font = '700 56px "Dancing Script", cursive';
-  ctx.fillText(pb.frame.title, W / 2, L.headerH - 36);
-  ctx.fillStyle = pb.frame.textColor;
-  ctx.font = '700 50px "Dancing Script", cursive';
-  ctx.fillText(CONFIG.footerText, W / 2, H - 62);
-  ctx.font = '500 22px Poppins, sans-serif';
-  ctx.fillText(CONFIG.footerSub, W / 2, H - 28);
+  ctx.textBaseline = 'middle';
+  ctx.fillText(emoji, c.width / 2, c.height / 2);
+  return c;
+}
+
+function buildFramePreviews() {
+  const placeholders = [makePlaceholder('📸'), makePlaceholder('🥰')];
+  const off = document.createElement('canvas');
+  CONFIG.frames.forEach((f) => {
+    drawStripTo(off, f, placeholders, 1);
+    const mini = document.createElement('canvas');
+    mini.width = 220;
+    mini.height = Math.round((off.height * mini.width) / off.width);
+    mini.getContext('2d').drawImage(off, 0, 0, mini.width, mini.height);
+    framePreviewSrc[f.id] = mini.toDataURL('image/jpeg', 0.85);
+  });
 }
 
 // ---------- kamera ----------
@@ -678,8 +1093,10 @@ async function ensureCamera() {
     err.name = 'Unsupported';
     throw err;
   }
+  // jangan paksa width/height: di beberapa HP malah bikin feed kameranya stretch;
+  // biarkan native, crop 4:3 dihitung dari dimensi aslinya
   pb.stream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 960 } },
+    video: { facingMode: 'user' },
     audio: false,
   });
   const video = $('#pb-video');
@@ -688,9 +1105,11 @@ async function ensureCamera() {
     if (video.readyState >= 2) res();
     else video.onloadeddata = () => res();
   });
+  startRecorder();
 }
 
 function stopCamera() {
+  stopRecorder();
   if (pb.stream) {
     pb.stream.getTracks().forEach((t) => t.stop());
     pb.stream = null;
@@ -701,21 +1120,52 @@ function stopCamera() {
 
 window.addEventListener('pagehide', stopCamera);
 
+// crop tengah 4:3 + mirror, dipakai jepretan asli & frame live
+function drawVideoCover(ctx, video, w, h) {
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if (!vw || !vh) return;
+  const scale = Math.max(w / vw, h / vh);
+  const sw = w / scale, sh = h / scale;
+  const sx = (vw - sw) / 2, sy = (vh - sh) / 2;
+  ctx.save();
+  ctx.translate(w, 0);
+  ctx.scale(-1, 1);
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
+  ctx.restore();
+}
+
+// perekam ring buffer: nyimpen N detik terakhir dari kamera terus-menerus
+function startRecorder() {
+  if (pb.recTimer) return;
+  const G = CONFIG.gif;
+  const maxFrames = Math.round(G.seconds * G.fps);
+  pb.ring = [];
+  pb.recTimer = setInterval(() => {
+    const video = $('#pb-video');
+    if (!video.videoWidth) return;
+    const c = document.createElement('canvas');
+    c.width = G.frameW;
+    c.height = G.frameH;
+    drawVideoCover(c.getContext('2d'), video, c.width, c.height);
+    pb.ring.push(c);
+    if (pb.ring.length > maxFrames) pb.ring.shift();
+  }, Math.round(1000 / G.fps));
+}
+
+function stopRecorder() {
+  clearInterval(pb.recTimer);
+  pb.recTimer = null;
+  pb.ring = [];
+}
+
 function captureTo(idx) {
   const { photoWidth: PW, photoHeight: PH } = CONFIG;
-  const video = $('#pb-video');
   const c = document.createElement('canvas');
   c.width = PW;
   c.height = PH;
-  const ctx = c.getContext('2d');
-  const vw = video.videoWidth, vh = video.videoHeight;
-  const scale = Math.max(PW / vw, PH / vh);
-  const sw = PW / scale, sh = PH / scale;
-  const sx = (vw - sw) / 2, sy = (vh - sh) / 2;
-  ctx.translate(PW, 0);
-  ctx.scale(-1, 1); // simpan mirror, sama seperti preview
-  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, PW, PH);
+  drawVideoCover(c.getContext('2d'), $('#pb-video'), PW, PH);
   pb.shots[idx] = c;
+  pb.liveShots[idx] = pb.ring.slice(); // 5 detik terakhir jadi "live photo" slot ini
 }
 
 // ---------- alur capture ----------
@@ -745,6 +1195,37 @@ function flash() {
   f.classList.add('on');
 }
 
+// nunggu tombol jepret dipencet (atau dibatalkan)
+function waitShutter() {
+  const btn = $('#pb-shutter');
+  btn.classList.remove('hidden');
+  return new Promise((resolve) => {
+    pb.shutterResolve = () => {
+      btn.classList.add('hidden');
+      pb.shutterResolve = null;
+      resolve();
+    };
+  });
+}
+
+// tampilkan hasil jepretan, tunggu keputusan: 'next' atau 'retake'
+function reviewShot(idx) {
+  const img = $('#pb-review-img');
+  const actions = $('#pb-review-actions');
+  img.src = pb.shots[idx].toDataURL('image/jpeg', 0.85);
+  img.classList.remove('hidden');
+  actions.classList.remove('hidden');
+  $('#pb-progress').textContent = 'Gimana, udah oke? Cek dulu hasilnya 👀';
+  return new Promise((resolve) => {
+    pb.reviewResolve = (choice) => {
+      img.classList.add('hidden');
+      actions.classList.add('hidden');
+      pb.reviewResolve = null;
+      resolve(choice);
+    };
+  });
+}
+
 async function runSequence(indices) {
   pb.busy = true;
   pb.abort = false;
@@ -758,14 +1239,27 @@ async function runSequence(indices) {
 
     for (let k = 0; k < indices.length; k++) {
       if (pb.abort) break;
-      progress.textContent = isFullSession
-        ? `Foto ${k + 1} dari ${pb.count} 📸 — senyum yang manis!`
-        : `Take ulang foto ke-${indices[k] + 1} 🔁 — pose lagi!`;
-      await countdown();
-      if (pb.abort) break;
-      captureTo(indices[k]);
-      flash();
-      await wait(CONFIG.pauseBetweenShots);
+      const idx = indices[k];
+      let accepted = false;
+      let attempt = 0;
+
+      while (!accepted && !pb.abort) {
+        progress.textContent = attempt > 0
+          ? 'Take ulang — pose lagi, pencet kalau udah siap 🔁'
+          : isFullSession
+            ? `Foto ${k + 1} dari ${pb.count} — pose dulu, pencet kalau udah siap 📸`
+            : `Take ulang foto ke-${idx + 1} — pencet kalau udah siap 🔁`;
+        await waitShutter();
+        if (pb.abort) break;
+        await countdown();
+        if (pb.abort) break;
+        captureTo(idx);
+        flash();
+        await wait(CONFIG.pauseBetweenShots);
+        const choice = await reviewShot(idx);
+        accepted = choice === 'next';
+        attempt++;
+      }
     }
 
     if (pb.abort) {
@@ -787,6 +1281,11 @@ async function runSequence(indices) {
     showStep('config');
   } finally {
     pb.busy = false;
+    pb.shutterResolve = null;
+    pb.reviewResolve = null;
+    $('#pb-shutter').classList.add('hidden');
+    $('#pb-review-img').classList.add('hidden');
+    $('#pb-review-actions').classList.add('hidden');
     $('#pb-progress').textContent = '';
     $('#pb-countdown').textContent = '';
   }
@@ -827,13 +1326,43 @@ function makeChip(label, selected, onClick) {
 }
 
 function buildChips() {
-  ['#pb-frames', '#pb-frames-result'].forEach((sel) => {
+  // kartu frame dengan gambar preview (step config)
+  const framesBox = $('#pb-frames');
+  framesBox.innerHTML = '';
+  CONFIG.frames.forEach((f) => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'pb-frame-card' + (f === pb.frame ? ' selected' : '');
+    card.innerHTML = `<img src="${framePreviewSrc[f.id] || ''}" alt="preview ${f.name}"><span>${f.icon} ${f.name}</span>`;
+    card.addEventListener('click', () => {
+      pb.frame = f;
+      buildChips();
+      rerenderIfResult();
+    });
+    framesBox.appendChild(card);
+  });
+
+  // chip frame versi ringkas (step hasil)
+  const resFrames = $('#pb-frames-result');
+  resFrames.innerHTML = '';
+  CONFIG.frames.forEach((f) => {
+    resFrames.appendChild(
+      makeChip(`<span class="chip-icon">${f.icon}</span>${f.name}`, f === pb.frame, () => {
+        pb.frame = f;
+        buildChips();
+        rerenderIfResult();
+      })
+    );
+  });
+
+  // layout 1 kolom / 2 kolom
+  ['#pb-layouts', '#pb-layouts-result'].forEach((sel) => {
     const box = $(sel);
     box.innerHTML = '';
-    CONFIG.frames.forEach((f) => {
+    CONFIG.layouts.forEach((ly) => {
       box.appendChild(
-        makeChip(`<span class="chip-icon">${f.icon}</span>${f.name}`, f === pb.frame, () => {
-          pb.frame = f;
+        makeChip(`<span class="chip-icon">${ly.icon}</span>${ly.name}`, ly.cols === pb.cols, () => {
+          pb.cols = ly.cols;
           buildChips();
           rerenderIfResult();
         })
@@ -914,6 +1443,102 @@ function buildThumbs() {
   });
 }
 
+// ---------- GIF live photo ----------
+let gifWorkerUrl = null;
+
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = res;
+    s.onerror = () => rej(new Error('gagal memuat ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+async function ensureGifLib() {
+  if (!window.GIF) {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js');
+  }
+  if (!gifWorkerUrl) {
+    // worker cross-origin diblokir browser, jadi diambil dulu lalu dibungkus blob
+    const r = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
+    gifWorkerUrl = URL.createObjectURL(await r.blob());
+  }
+}
+
+async function saveGif() {
+  const btn = $('#pb-save-gif');
+  if (pb.busy || btn.disabled) return;
+  const hasLive = pb.liveShots.some((f) => f && f.length);
+  if (!hasLive) {
+    btn.textContent = 'Belum ada rekaman live 😢';
+    setTimeout(() => (btn.textContent = 'Simpan GIF 🎞️'), 2500);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Nyiapin encoder… ';
+  const G = CONFIG.gif;
+
+  try {
+    await ensureGifLib();
+
+    const frameCount = Math.max(...pb.liveShots.map((f) => (f ? f.length : 0)));
+    const { W, H } = stripDims(pb.shots.length, pb.cols);
+    const gw = G.stripWidth;
+    const gh = Math.round((H * gw) / W);
+
+    const full = document.createElement('canvas');
+    const small = document.createElement('canvas');
+    small.width = gw;
+    small.height = gh;
+    const sctx = small.getContext('2d');
+
+    // terapkan filter/atur warna sekali per frame live (bukan tiap render)
+    const processed = pb.liveShots.map((fr) => (fr && fr.length ? fr.map((c) => processShot(c)) : null));
+    const stills = pb.shots.map((s) => (s ? processShot(s) : null));
+
+    const gif = new GIF({ workers: G.workers || 2, quality: G.quality, width: gw, height: gh, workerScript: gifWorkerUrl });
+    gif.on('progress', (p) => {
+      btn.textContent = `Encoding GIF… ${50 + Math.round(p * 50)}%`;
+    });
+
+    for (let t = 0; t < frameCount; t++) {
+      const imgs = pb.shots.map((s, i) => {
+        const fr = processed[i];
+        return fr ? fr[t % fr.length] : stills[i];
+      });
+      drawStripTo(full, pb.frame, imgs, pb.cols);
+      sctx.drawImage(full, 0, 0, gw, gh);
+      gif.addFrame(sctx, { copy: true, delay: Math.round(1000 / G.fps) });
+      btn.textContent = `Nyusun frame… ${Math.round(((t + 1) / frameCount) * 50)}%`;
+      await wait(0); // kasih napas ke UI
+    }
+
+    const blob = await new Promise((resolve, reject) => {
+      gif.on('finished', resolve);
+      gif.on('abort', () => reject(new Error('dibatalkan')));
+      gif.render();
+    });
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${CONFIG.fileName}.gif`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    btn.textContent = 'Simpan GIF 🎞️';
+  } catch (err) {
+    btn.textContent = 'GIF gagal 😢 coba lagi';
+    console.warn('gif error:', err);
+    setTimeout(() => (btn.textContent = 'Simpan GIF 🎞️'), 3000);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 // ---------- simpan ----------
 function saveStrip(fmt) {
   const canvas = $('#pb-canvas');
@@ -950,24 +1575,45 @@ function spawnHearts() {
 }
 
 // ---------- init ----------
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   spawnHearts();
-  buildChips();
   initSliders();
+
+  // tunggu font script kebaca dulu biar preview frame-nya cakep, baru bangun kartu
+  try { await document.fonts.load('700 60px "Dancing Script"'); } catch (e) { /* fallback */ }
+  buildFramePreviews();
+  buildChips();
 
   $('#pb-start').addEventListener('click', () => {
     if (pb.busy) return;
     $('#pb-error').classList.add('hidden');
     pb.shots = new Array(pb.count).fill(null);
+    pb.liveShots = new Array(pb.count).fill(null);
     runSequence(pb.shots.map((_, i) => i));
+  });
+
+  $('#pb-shutter').addEventListener('click', () => {
+    if (pb.shutterResolve) pb.shutterResolve();
+  });
+
+  $('#pb-accept').addEventListener('click', () => {
+    if (pb.reviewResolve) pb.reviewResolve('next');
+  });
+
+  $('#pb-redo').addEventListener('click', () => {
+    if (pb.reviewResolve) pb.reviewResolve('retake');
   });
 
   $('#pb-cancel').addEventListener('click', () => {
     pb.abort = true;
+    // lepasin loop yang lagi nunggu jepret / nunggu keputusan cek hasil
+    if (pb.shutterResolve) pb.shutterResolve();
+    if (pb.reviewResolve) pb.reviewResolve('next');
   });
 
   $('#pb-save-png').addEventListener('click', () => saveStrip('png'));
   $('#pb-save-jpg').addEventListener('click', () => saveStrip('jpg'));
+  $('#pb-save-gif').addEventListener('click', saveGif);
 
   $('#pb-again').addEventListener('click', () => {
     if (!pb.busy) showStep('config');
