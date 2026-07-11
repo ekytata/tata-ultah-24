@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photobooth 📸 — Nurul 24th</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%93%B8</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink: #ff6fa5;
+  --pink-soft: #ffb199;
+  --lilac: #d291ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #fff5f8;
+  background: linear-gradient(135deg, #2b0a3d, #6a1b4d, #ff6fa5, #ffb199);
+  background-size: 400% 400%;
+  animation: gradientShift 18s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.bg-hearts {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-hearts span {
+  position: absolute;
+  bottom: -10%;
+  opacity: 0;
+  animation: floatUp linear infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 111, 165, 0.5));
+}
+
+@keyframes floatUp {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.7; }
+  50%  { transform: translateY(-60vh) translateX(18px) rotate(14deg); }
+  100% { transform: translateY(-115vh) translateX(-14px) rotate(-8deg); opacity: 0; }
+}
+
+.pb-page {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2.2rem 1.2rem 3rem;
+  text-align: center;
+}
+
+.script-title {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(2.1rem, 6vw, 3rem);
+  margin: 0 0 0.3rem;
+  text-shadow: 0 4px 20px rgba(255, 111, 165, 0.6);
+}
+
+.pb-sub {
+  opacity: 0.85;
+  margin: 0 0 1.6rem;
+  font-size: 0.95rem;
+}
+
+.pb-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 26px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  padding: 1.8rem 1.6rem 2rem;
+  margin-bottom: 1.4rem;
+}
+
+.hidden { display: none !important; }
+
+.pb-group { margin-bottom: 1.5rem; }
+.pb-group h3, .pb-card h3 {
+  margin: 0 0 0.7rem;
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+.pb-card h3 { margin-top: 1.3rem; }
+
+.pb-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: center;
+}
+
+.pb-chip {
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-radius: 40px;
+  padding: 0.5rem 1rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pb-chip:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.18); }
+
+.pb-chip.selected {
+  background: linear-gradient(135deg, var(--pink), var(--pink-soft));
+  border-color: transparent;
+  box-shadow: 0 6px 16px rgba(255, 111, 165, 0.45);
+  font-weight: 600;
+}
+
+.chip-icon { margin-right: 6px; }
+
+.btn {
+  border: none;
+  border-radius: 50px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.9rem 1.9rem;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, var(--pink), var(--pink-soft));
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 12px 28px rgba(255, 111, 165, 0.5); }
+.btn:active { transform: translateY(1px) scale(0.98); }
+.btn.alt { background: linear-gradient(135deg, var(--lilac), var(--pink)); }
+.btn.ghost {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: none;
+  font-size: 0.85rem;
+  padding: 0.6rem 1.2rem;
+}
+
+.pb-error {
+  color: #ffb3c6;
+  font-size: 0.88rem;
+  margin: 1rem auto 0;
+  line-height: 1.55;
+  max-width: 460px;
+}
+
+.pb-video-box {
+  position: relative;
+  width: min(100%, 540px);
+  aspect-ratio: 4 / 3;
+  margin: 0 auto;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+#pb-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* mirror ala selfie */
+}
+
+.pb-countdown {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 4px 26px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+}
+
+.pb-countdown.pop { animation: cdPop 0.9s ease; }
+
+@keyframes cdPop {
+  0%   { transform: scale(1.7); opacity: 0.2; }
+  30%  { transform: scale(1); opacity: 1; }
+  100% { opacity: 0.85; }
+}
+
+.pb-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pb-flash.on { animation: flashBlink 0.45s ease; }
+
+@keyframes flashBlink {
+  0%   { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+
+.pb-progress {
+  margin: 1rem 0 0.4rem;
+  font-weight: 600;
+}
+
+.pb-strip-box {
+  max-height: 62vh;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.6rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+#pb-canvas {
+  width: min(66vw, 300px);
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+}
+
+.pb-sliders {
+  display: grid;
+  gap: 0.55rem;
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.pb-sliders label {
+  display: grid;
+  grid-template-columns: 7.2rem 1fr 3.2rem;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.pb-sliders input[type="range"] {
+  width: 100%;
+  accent-color: var(--pink);
+}
+
+.pb-sliders output { font-size: 0.8rem; opacity: 0.85; text-align: right; }
+
+.pb-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  justify-content: center;
+}
+
+.pb-thumb { width: 96px; }
+
+.pb-thumb img {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+.pb-retake {
+  margin-top: 5px;
+  width: 100%;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 4px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  touch-action: manipulation;
+}
+
+.pb-retake:hover { background: rgba(255, 255, 255, 0.32); }
+
+.pb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  justify-content: center;
+  margin-top: 1.4rem;
+}
+
+.back-link { margin-top: 0.6rem; }
+.back-link a {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+.back-link a:hover { color: #fff; text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .pb-page { padding: 1.6rem 0.9rem 2.4rem; }
+  .pb-card { padding: 1.4rem 1rem 1.6rem; border-radius: 20px; }
+  .pb-countdown { font-size: 4.4rem; }
+  #pb-canvas { width: min(78vw, 280px); }
+  .pb-actions { flex-direction: column; align-items: stretch; }
+  .pb-actions .btn { width: 100%; }
+  .pb-thumb { width: 84px; }
+  .pb-sliders label { grid-template-columns: 6rem 1fr 3rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-hearts" aria-hidden="true"></div>
+
+<main class="pb-page">
+  <h1 class="script-title">Photobooth Time! 📸</h1>
+  <p class="pb-sub">Bikin strip foto kenang-kenangan ulang tahun ke-24 kamu 🎂</p>
+
+  <!-- STEP 1: CONFIG -->
+  <section class="pb-card" id="step-config">
+    <div class="pb-group">
+      <h3>Pilih frame 🖼️</h3>
+      <div class="pb-chips" id="pb-frames"></div>
+    </div>
+    <div class="pb-group">
+      <h3>Jumlah foto 🔢</h3>
+      <div class="pb-chips" id="pb-counts"></div>
+    </div>
+    <div class="pb-group">
+      <h3>Filter warna 🎨</h3>
+      <div class="pb-chips" id="pb-filters"></div>
+    </div>
+    <button class="btn" id="pb-start">Mulai 📷</button>
+    <p class="pb-error hidden" id="pb-error"></p>
+  </section>
+
+  <!-- STEP 2: CAPTURE -->
+  <section class="pb-card hidden" id="step-capture">
+    <div class="pb-video-box">
+      <video id="pb-video" autoplay playsinline muted></video>
+      <div class="pb-countdown" id="pb-countdown"></div>
+      <div class="pb-flash" id="pb-flash"></div>
+    </div>
+    <p class="pb-progress" id="pb-progress"></p>
+    <button class="btn ghost" id="pb-cancel">✕ Batal</button>
+  </section>
+
+  <!-- STEP 3: RESULT -->
+  <section class="pb-card hidden" id="step-result">
+    <div class="pb-strip-box"><canvas id="pb-canvas"></canvas></div>
+
+    <h3>Ganti frame 🖼️</h3>
+    <div class="pb-chips" id="pb-frames-result"></div>
+
+    <h3>Filter 🎨</h3>
+    <div class="pb-chips" id="pb-filters-result"></div>
+
+    <h3>Atur warna 🎚️</h3>
+    <div class="pb-sliders">
+      <label>☀️ Kecerahan
+        <input type="range" id="sl-bright" min="60" max="140" value="100">
+        <output id="out-bright">100%</output>
+      </label>
+      <label>◐ Kontras
+        <input type="range" id="sl-contrast" min="60" max="140" value="100">
+        <output id="out-contrast">100%</output>
+      </label>
+      <label>🌈 Saturasi
+        <input type="range" id="sl-sat" min="0" max="200" value="100">
+        <output id="out-sat">100%</output>
+      </label>
+    </div>
+
+    <h3>Take ulang salah satu? 🔁</h3>
+    <div class="pb-thumbs" id="pb-thumbs"></div>
+
+    <div class="pb-actions">
+      <button class="btn" id="pb-save-png">Simpan PNG ⬇️</button>
+      <button class="btn" id="pb-save-jpg">Simpan JPG ⬇️</button>
+      <button class="btn alt" id="pb-again">Sesi baru 🔄</button>
+    </div>
+  </section>
+
+  <p class="back-link"><a href="index.html">← balik ke website ucapan</a></p>
+</main>
+
+<script>
+// ================== CONFIG (silakan diubah-ubah) ==================
+const CONFIG = {
+  minShots: 3,
+  maxShots: 8,
+  defaultShots: 4,
+  countdownSeconds: 3,   // hitung mundur tiap foto
+  pauseBetweenShots: 900, // jeda antar foto (ms)
+  photoWidth: 640,        // resolusi tiap foto di strip (4:3)
+  photoHeight: 480,
+  fileName: 'photobooth-nurul-24',
+  jpgQuality: 0.92,
+
+  layout: {
+    pad: 56,        // margin kiri-kanan strip (tempat hiasan)
+    headerH: 112,   // ruang judul di atas
+    footerH: 132,   // ruang tanda tangan di bawah
+    gap: 26,        // jarak antar foto
+    photoBorder: 12 // tebal border putih tiap foto
+  },
+
+  footerText: 'Nurul ♡ Sallie',
+  footerSub: '24th Birthday 🎂',
+
+  frames: [
+    {
+      id: 'pink', name: 'Pink Party', icon: '🎀',
+      bgTop: '#ffd9e8', bgBottom: '#ff9ec3', deco: 'none',
+      edgeEmojis: ['🎀', '🎈', '💖', '✨', '🎂'],
+      title: 'Happy Birthday Sayang!',
+      titleColor: '#ad1457', textColor: '#7c1240'
+    },
+    {
+      id: 'jerapah', name: 'Jerapah Party', icon: '🦒',
+      bgTop: '#ffedbc', bgBottom: '#ffc95e', deco: 'giraffe',
+      patchColor: 'rgba(186, 111, 34, 0.85)',
+      edgeEmojis: ['🦒', '🌿', '🎉', '☀️'],
+      title: 'Jerapah bilang: Met Ultah!',
+      titleColor: '#8a4b12', textColor: '#6e3c0e'
+    },
+    {
+      id: 'confetti', name: 'Confetti Pop', icon: '🎉',
+      bgTop: '#fffdf7', bgBottom: '#fff0d9', deco: 'confetti',
+      edgeEmojis: ['🎉', '🎊', '🥳', '🎁'],
+      title: 'Yeay, 24 Tahun!',
+      titleColor: '#e91e63', textColor: '#5a3a5e'
+    },
+    {
+      id: 'sapi', name: 'Sapi Kesayangan', icon: '🐄',
+      bgTop: '#ffffff', bgBottom: '#f1f1f1', deco: 'cow',
+      patchColor: 'rgba(28, 28, 28, 0.9)',
+      edgeEmojis: ['🐄', '🐮', '🌼', '💕'],
+      title: 'Moo-y Birthday!',
+      titleColor: '#2e2e2e', textColor: '#464646'
+    }
+  ],
+
+  filters: [
+    { id: 'normal', name: 'Normal',     css: '' },
+    { id: 'bw',     name: 'B&W',        css: 'grayscale(1)' },
+    { id: 'sepia',  name: 'Sepia',      css: 'sepia(0.75)' },
+    { id: 'warm',   name: 'Warm',       css: 'saturate(1.15) sepia(0.22) brightness(1.05)' },
+    { id: 'cool',   name: 'Cool',       css: 'saturate(1.05) hue-rotate(-12deg) brightness(1.04)' },
+    { id: 'pinky',  name: 'Sweet Pink', css: 'brightness(1.07) saturate(1.2) contrast(0.94)' }
+  ]
+};
+// ==================================================================
+
+const $ = (sel) => document.querySelector(sel);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const clamp255 = (v) => (v < 0 ? 0 : v > 255 ? 255 : v);
+
+const pb = {
+  frame: CONFIG.frames[0],
+  filter: CONFIG.filters[0],
+  count: CONFIG.defaultShots,
+  adjust: { b: 1, c: 1, s: 1 }, // brightness/contrast/saturation (1 = normal)
+  shots: [],
+  stream: null,
+  busy: false,
+  abort: false,
+};
+
+// ---------- filter pixel ops (jalan di semua browser, tanpa ctx.filter) ----------
+const PIXEL_FILTERS = {
+  bw(d) {
+    for (let i = 0; i < d.length; i += 4) {
+      const v = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      d[i] = d[i + 1] = d[i + 2] = v;
+    }
+  },
+  sepia(d) {
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      d[i]     = clamp255(0.393 * r + 0.769 * g + 0.189 * b);
+      d[i + 1] = clamp255(0.349 * r + 0.686 * g + 0.168 * b);
+      d[i + 2] = clamp255(0.272 * r + 0.534 * g + 0.131 * b);
+    }
+  },
+  warm(d) {
+    for (let i = 0; i < d.length; i += 4) {
+      d[i]     = clamp255(d[i] * 1.09 + 8);
+      d[i + 1] = clamp255(d[i + 1] * 1.03);
+      d[i + 2] = clamp255(d[i + 2] * 0.92);
+    }
+  },
+  cool(d) {
+    for (let i = 0; i < d.length; i += 4) {
+      d[i]     = clamp255(d[i] * 0.93);
+      d[i + 1] = clamp255(d[i + 1] * 1.02);
+      d[i + 2] = clamp255(d[i + 2] * 1.1 + 8);
+    }
+  },
+  pinky(d) {
+    for (let i = 0; i < d.length; i += 4) {
+      d[i]     = clamp255(d[i] * 1.1 + 12);
+      d[i + 1] = clamp255(d[i + 1] * 0.97 + 2);
+      d[i + 2] = clamp255(d[i + 2] * 1.03 + 8);
+    }
+  },
+};
+
+function adjustPixels(d, b, c, s) {
+  if (b === 1 && c === 1 && s === 1) return;
+  for (let i = 0; i < d.length; i += 4) {
+    let r = d[i] * b, g = d[i + 1] * b, bl = d[i + 2] * b;
+    r = (r - 128) * c + 128;
+    g = (g - 128) * c + 128;
+    bl = (bl - 128) * c + 128;
+    const lum = 0.299 * r + 0.587 * g + 0.114 * bl;
+    d[i]     = clamp255(lum + (r - lum) * s);
+    d[i + 1] = clamp255(lum + (g - lum) * s);
+    d[i + 2] = clamp255(lum + (bl - lum) * s);
+  }
+}
+
+function processShot(src) {
+  const c = document.createElement('canvas');
+  c.width = src.width;
+  c.height = src.height;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(src, 0, 0);
+  const im = ctx.getImageData(0, 0, c.width, c.height);
+  const fn = PIXEL_FILTERS[pb.filter.id];
+  if (fn) fn(im.data);
+  adjustPixels(im.data, pb.adjust.b, pb.adjust.c, pb.adjust.s);
+  ctx.putImageData(im, 0, 0);
+  return c;
+}
+
+// ---------- random dengan seed: hiasan frame konsisten tiap re-render ----------
+function mulberry32(seed) {
+  return function () {
+    seed |= 0;
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function randMarginPoint(rnd, W, H, L) {
+  const zone = rnd();
+  if (zone < 0.3) return [8 + rnd() * (L.pad - 16), rnd() * H];
+  if (zone < 0.6) return [W - L.pad + 8 + rnd() * (L.pad - 16), rnd() * H];
+  if (zone < 0.8) return [rnd() * W, 10 + rnd() * Math.max(L.headerH - 74, 20)];
+  return [rnd() * W, H - L.footerH + 14 + rnd() * 28];
+}
+
+function drawFrameDecor(ctx, frame, W, H) {
+  const L = CONFIG.layout;
+  const rnd = mulberry32(9137 + frame.id.length * 131 + pb.shots.length * 977);
+
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, frame.bgTop);
+  g.addColorStop(1, frame.bgBottom);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  if (frame.deco === 'giraffe' || frame.deco === 'cow') {
+    ctx.fillStyle = frame.patchColor;
+    const patches = Math.round((W * H) / 26000);
+    for (let i = 0; i < patches; i++) {
+      const [x, y] = randMarginPoint(rnd, W, H, L);
+      const rx = 14 + rnd() * 24;
+      const ry = rx * (0.6 + rnd() * 0.5);
+      ctx.beginPath();
+      ctx.ellipse(x, y, rx, ry, rnd() * Math.PI, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  if (frame.deco === 'confetti') {
+    const colors = ['#ff6fa5', '#ffc107', '#4fc3f7', '#81c784', '#b39ddb', '#ff8a65'];
+    const bits = Math.round((W * H) / 9000);
+    for (let i = 0; i < bits; i++) {
+      const [x, y] = randMarginPoint(rnd, W, H, L);
+      ctx.fillStyle = colors[Math.floor(rnd() * colors.length)];
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rnd() * Math.PI);
+      if (rnd() < 0.5) ctx.fillRect(-5, -2.5, 10, 5);
+      else { ctx.beginPath(); ctx.arc(0, 0, 3.5 + rnd() * 2.5, 0, Math.PI * 2); ctx.fill(); }
+      ctx.restore();
+    }
+  }
+
+  const emojiCount = Math.round(H / 85);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i < emojiCount; i++) {
+    const em = frame.edgeEmojis[i % frame.edgeEmojis.length];
+    const [x, y] = randMarginPoint(rnd, W, H, L);
+    const size = 24 + rnd() * 18;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((rnd() - 0.5) * 0.9);
+    ctx.font = size + 'px serif';
+    ctx.fillText(em, 0, 0);
+    ctx.restore();
+  }
+}
+
+async function renderStrip() {
+  const { photoWidth: PW, photoHeight: PH, layout: L } = CONFIG;
+  const n = pb.shots.length;
+  const W = PW + L.pad * 2;
+  const H = L.headerH + n * PH + (n - 1) * L.gap + L.footerH;
+  const canvas = $('#pb-canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  try { await document.fonts.load('700 60px "Dancing Script"'); } catch (e) { /* pakai fallback */ }
+
+  drawFrameDecor(ctx, pb.frame, W, H);
+
+  pb.shots.forEach((shot, i) => {
+    if (!shot) return;
+    const x = L.pad;
+    const y = L.headerH + i * (PH + L.gap);
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.28)';
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetY = 8;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x - L.photoBorder, y - L.photoBorder, PW + L.photoBorder * 2, PH + L.photoBorder * 2);
+    ctx.restore();
+    ctx.drawImage(processShot(shot), x, y);
+  });
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = pb.frame.titleColor;
+  ctx.font = '700 56px "Dancing Script", cursive';
+  ctx.fillText(pb.frame.title, W / 2, L.headerH - 36);
+  ctx.fillStyle = pb.frame.textColor;
+  ctx.font = '700 50px "Dancing Script", cursive';
+  ctx.fillText(CONFIG.footerText, W / 2, H - 62);
+  ctx.font = '500 22px Poppins, sans-serif';
+  ctx.fillText(CONFIG.footerSub, W / 2, H - 28);
+}
+
+// ---------- kamera ----------
+async function ensureCamera() {
+  if (pb.stream) return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    const err = new Error('unsupported');
+    err.name = 'Unsupported';
+    throw err;
+  }
+  pb.stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 960 } },
+    audio: false,
+  });
+  const video = $('#pb-video');
+  video.srcObject = pb.stream;
+  await new Promise((res) => {
+    if (video.readyState >= 2) res();
+    else video.onloadeddata = () => res();
+  });
+}
+
+function stopCamera() {
+  if (pb.stream) {
+    pb.stream.getTracks().forEach((t) => t.stop());
+    pb.stream = null;
+  }
+  const video = $('#pb-video');
+  if (video) video.srcObject = null;
+}
+
+window.addEventListener('pagehide', stopCamera);
+
+function captureTo(idx) {
+  const { photoWidth: PW, photoHeight: PH } = CONFIG;
+  const video = $('#pb-video');
+  const c = document.createElement('canvas');
+  c.width = PW;
+  c.height = PH;
+  const ctx = c.getContext('2d');
+  const vw = video.videoWidth, vh = video.videoHeight;
+  const scale = Math.max(PW / vw, PH / vh);
+  const sw = PW / scale, sh = PH / scale;
+  const sx = (vw - sw) / 2, sy = (vh - sh) / 2;
+  ctx.translate(PW, 0);
+  ctx.scale(-1, 1); // simpan mirror, sama seperti preview
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, PW, PH);
+  pb.shots[idx] = c;
+}
+
+// ---------- alur capture ----------
+function showStep(step) {
+  ['config', 'capture', 'result'].forEach((s) => {
+    $('#step-' + s).classList.toggle('hidden', s !== step);
+  });
+}
+
+async function countdown() {
+  const el = $('#pb-countdown');
+  for (let s = CONFIG.countdownSeconds; s > 0; s--) {
+    if (pb.abort) return;
+    el.textContent = s;
+    el.classList.remove('pop');
+    void el.offsetWidth;
+    el.classList.add('pop');
+    await wait(1000);
+  }
+  el.textContent = '';
+}
+
+function flash() {
+  const f = $('#pb-flash');
+  f.classList.remove('on');
+  void f.offsetWidth;
+  f.classList.add('on');
+}
+
+async function runSequence(indices) {
+  pb.busy = true;
+  pb.abort = false;
+  showStep('capture');
+  const progress = $('#pb-progress');
+  const isFullSession = indices.length === pb.count;
+
+  try {
+    await ensureCamera();
+    applyPreviewFilter();
+
+    for (let k = 0; k < indices.length; k++) {
+      if (pb.abort) break;
+      progress.textContent = isFullSession
+        ? `Foto ${k + 1} dari ${pb.count} 📸 — senyum yang manis!`
+        : `Take ulang foto ke-${indices[k] + 1} 🔁 — pose lagi!`;
+      await countdown();
+      if (pb.abort) break;
+      captureTo(indices[k]);
+      flash();
+      await wait(CONFIG.pauseBetweenShots);
+    }
+
+    if (pb.abort) {
+      // batal: kalau semua slot sudah terisi (kasus retake), balik ke hasil
+      if (pb.shots.length && pb.shots.every(Boolean)) {
+        await renderStrip();
+        showStep('result');
+      } else {
+        showStep('config');
+      }
+      return;
+    }
+
+    await renderStrip();
+    buildThumbs();
+    showStep('result');
+  } catch (err) {
+    showError(err);
+    showStep('config');
+  } finally {
+    pb.busy = false;
+    $('#pb-progress').textContent = '';
+    $('#pb-countdown').textContent = '';
+  }
+}
+
+function showError(err) {
+  const el = $('#pb-error');
+  let msg = 'Kameranya gagal dibuka 😢 (' + (err && err.name ? err.name : err) + ')';
+  if (err && err.name === 'NotAllowedError') {
+    msg = 'Izin kameranya ditolak 🙏 Izinkan akses kamera di browser (ikon 🔒/kamera di address bar), lalu coba lagi ya.';
+  } else if (err && err.name === 'NotFoundError') {
+    msg = 'Kamera tidak ditemukan di perangkat ini 😢';
+  } else if (err && err.name === 'Unsupported') {
+    msg = 'Browser/alamat ini tidak mendukung kamera. Buka lewat http://localhost — jalankan "python3 -m http.server" di folder website, lalu buka http://localhost:8000/photobooth.html';
+  }
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+// ---------- UI: chips, slider, thumbs ----------
+function applyPreviewFilter() {
+  const css = [
+    pb.filter.css,
+    `brightness(${pb.adjust.b})`,
+    `contrast(${pb.adjust.c})`,
+    `saturate(${pb.adjust.s})`,
+  ].filter(Boolean).join(' ');
+  $('#pb-video').style.filter = css;
+}
+
+function makeChip(label, selected, onClick) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'pb-chip' + (selected ? ' selected' : '');
+  b.innerHTML = label;
+  b.addEventListener('click', onClick);
+  return b;
+}
+
+function buildChips() {
+  ['#pb-frames', '#pb-frames-result'].forEach((sel) => {
+    const box = $(sel);
+    box.innerHTML = '';
+    CONFIG.frames.forEach((f) => {
+      box.appendChild(
+        makeChip(`<span class="chip-icon">${f.icon}</span>${f.name}`, f === pb.frame, () => {
+          pb.frame = f;
+          buildChips();
+          rerenderIfResult();
+        })
+      );
+    });
+  });
+
+  const countsBox = $('#pb-counts');
+  countsBox.innerHTML = '';
+  for (let n = CONFIG.minShots; n <= CONFIG.maxShots; n++) {
+    countsBox.appendChild(
+      makeChip(`${n} foto`, n === pb.count, () => {
+        pb.count = n;
+        buildChips();
+      })
+    );
+  }
+
+  ['#pb-filters', '#pb-filters-result'].forEach((sel) => {
+    const box = $(sel);
+    box.innerHTML = '';
+    CONFIG.filters.forEach((f) => {
+      box.appendChild(
+        makeChip(f.name, f === pb.filter, () => {
+          pb.filter = f;
+          buildChips();
+          applyPreviewFilter();
+          rerenderIfResult();
+        })
+      );
+    });
+  });
+}
+
+let renderTimer = null;
+function rerenderIfResult() {
+  if ($('#step-result').classList.contains('hidden')) return;
+  if (!pb.shots.some(Boolean)) return;
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(renderStrip, 120);
+}
+
+function initSliders() {
+  const wire = (inputSel, outSel, key) => {
+    const input = $(inputSel);
+    const out = $(outSel);
+    input.addEventListener('input', () => {
+      pb.adjust[key] = input.value / 100;
+      out.textContent = input.value + '%';
+      applyPreviewFilter();
+      rerenderIfResult();
+    });
+  };
+  wire('#sl-bright', '#out-bright', 'b');
+  wire('#sl-contrast', '#out-contrast', 'c');
+  wire('#sl-sat', '#out-sat', 's');
+}
+
+function buildThumbs() {
+  const box = $('#pb-thumbs');
+  box.innerHTML = '';
+  pb.shots.forEach((shot, i) => {
+    if (!shot) return;
+    const item = document.createElement('div');
+    item.className = 'pb-thumb';
+    const img = document.createElement('img');
+    img.src = shot.toDataURL('image/jpeg', 0.6);
+    img.alt = 'foto ' + (i + 1);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pb-retake';
+    btn.textContent = `↻ Foto ${i + 1}`;
+    btn.addEventListener('click', () => {
+      if (!pb.busy) runSequence([i]).then(buildThumbs);
+    });
+    item.append(img, btn);
+    box.appendChild(item);
+  });
+}
+
+// ---------- simpan ----------
+function saveStrip(fmt) {
+  const canvas = $('#pb-canvas');
+  const mime = fmt === 'png' ? 'image/png' : 'image/jpeg';
+  canvas.toBlob(
+    (blob) => {
+      if (!blob) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${CONFIG.fileName}.${fmt}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    },
+    mime,
+    CONFIG.jpgQuality
+  );
+}
+
+// ---------- ambient hearts ----------
+function spawnHearts() {
+  const box = document.querySelector('.bg-hearts');
+  const glyphs = ['💗', '💕', '✨', '📸'];
+  for (let i = 0; i < 14; i++) {
+    const el = document.createElement('span');
+    el.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.fontSize = 0.8 + Math.random() * 1.2 + 'rem';
+    el.style.animationDuration = 9 + Math.random() * 9 + 's';
+    el.style.animationDelay = Math.random() * 9 + 's';
+    box.appendChild(el);
+  }
+}
+
+// ---------- init ----------
+document.addEventListener('DOMContentLoaded', () => {
+  spawnHearts();
+  buildChips();
+  initSliders();
+
+  $('#pb-start').addEventListener('click', () => {
+    if (pb.busy) return;
+    $('#pb-error').classList.add('hidden');
+    pb.shots = new Array(pb.count).fill(null);
+    runSequence(pb.shots.map((_, i) => i));
+  });
+
+  $('#pb-cancel').addEventListener('click', () => {
+    pb.abort = true;
+  });
+
+  $('#pb-save-png').addEventListener('click', () => saveStrip('png'));
+  $('#pb-save-jpg').addEventListener('click', () => saveStrip('jpg'));
+
+  $('#pb-again').addEventListener('click', () => {
+    if (!pb.busy) showStep('config');
+  });
+});
+</script>
+</body>
+</html>
