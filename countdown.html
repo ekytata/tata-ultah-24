@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bentar lagi... 🎁</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%8E%81</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #fff5f8;
+  background: linear-gradient(135deg, #2b0a3d, #6a1b4d, #ff6fa5, #ffb199);
+  background-size: 400% 400%;
+  animation: gradientShift 18s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.6rem 1rem;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.bg-hearts {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-hearts span {
+  position: absolute;
+  bottom: -10%;
+  opacity: 0;
+  animation: floatUp linear infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 111, 165, 0.5));
+}
+
+@keyframes floatUp {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.7; }
+  50%  { transform: translateY(-60vh) translateX(18px) rotate(14deg); }
+  100% { transform: translateY(-115vh) translateX(-14px) rotate(-8deg); opacity: 0; }
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 28px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  padding: 2.6rem 2rem;
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+}
+
+.gift-icon {
+  font-size: 3.2rem;
+  animation: bounce 2s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50%      { transform: translateY(-10px) rotate(4deg); }
+}
+
+h1 {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  margin: 0.4rem 0 0.5rem;
+  text-shadow: 0 4px 20px rgba(255, 111, 165, 0.6);
+}
+
+.sub {
+  opacity: 0.85;
+  font-size: 0.95rem;
+  margin: 0 0 1.8rem;
+  line-height: 1.55;
+}
+
+.timer {
+  display: flex;
+  gap: 0.7rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.6rem;
+}
+
+.unit {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+  padding: 0.9rem 0.4rem;
+  min-width: 86px;
+}
+
+.unit b {
+  display: block;
+  font-size: clamp(1.9rem, 7vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.unit span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  opacity: 0.75;
+}
+
+.target {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.sign {
+  margin-top: 1.4rem;
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.3rem;
+  opacity: 0.9;
+}
+
+@media (max-width: 480px) {
+  .card { padding: 2rem 1.2rem; }
+  .timer { gap: 0.5rem; }
+  .unit { min-width: 70px; padding: 0.7rem 0.3rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-hearts" aria-hidden="true"></div>
+
+<main class="card">
+  <span class="gift-icon">🎁</span>
+  <h1>Bentar lagi ya, sayang...</h1>
+  <p class="sub">Ada sesuatu yang spesial buat <b>Nurul Sasmitha</b> 💝<br>
+  Hadiahnya baru bisa dibuka dalam:</p>
+
+  <div class="timer">
+    <div class="unit"><b id="cd-d">--</b><span>HARI</span></div>
+    <div class="unit"><b id="cd-h">--</b><span>JAM</span></div>
+    <div class="unit"><b id="cd-m">--</b><span>MENIT</span></div>
+    <div class="unit"><b id="cd-s">--</b><span>DETIK</span></div>
+  </div>
+
+  <p class="target">🗓️ 13 Juli 2026 • 00:00</p>
+  <p class="sign">— dari seseorang yang sayang kamu 💌</p>
+</main>
+
+<script>
+// samakan dengan gerbang waktu di index.html
+const TARGET = new Date('2026-07-13T00:00:00');
+
+const pad = (v) => String(v).padStart(2, '0');
+
+function tick() {
+  const diff = TARGET - new Date();
+  if (diff <= 0) {
+    location.replace('index.html');
+    return;
+  }
+  document.getElementById('cd-d').textContent = pad(Math.floor(diff / 86400000));
+  document.getElementById('cd-h').textContent = pad(Math.floor(diff / 3600000) % 24);
+  document.getElementById('cd-m').textContent = pad(Math.floor(diff / 60000) % 60);
+  document.getElementById('cd-s').textContent = pad(Math.floor(diff / 1000) % 60);
+}
+
+tick();
+setInterval(tick, 250);
+
+// hati-hati melayang
+const box = document.querySelector('.bg-hearts');
+const glyphs = ['💗', '💕', '✨', '🎁'];
+for (let i = 0; i < 16; i++) {
+  const el = document.createElement('span');
+  el.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+  el.style.left = Math.random() * 100 + 'vw';
+  el.style.fontSize = 0.8 + Math.random() * 1.2 + 'rem';
+  el.style.animationDuration = 9 + Math.random() * 9 + 's';
+  el.style.animationDelay = Math.random() * 9 + 's';
+  box.appendChild(el);
+}
+</script>
+</body>
+</html>
