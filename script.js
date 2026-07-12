@@ -13,7 +13,7 @@ const MESSAGES = [
   'Semoga apa yang kamu mimpikan pelan-pelan bisa jadi kenyataan 🌷',
   'Sehat-sehat terus yahh tatacuu, bahagia terus 💖',
   'Bismillah yok bisa yok tahun depan ultah sdh tinggal serumah 😆',
-  'love you so much, happy birthday, sayangku 💖',
+  'love you so much, happy birthday, tayangkuu 💖',
 ];
 
 const FLEE_LINES = [
@@ -149,6 +149,20 @@ function placeCowRandom(cow) {
   cow.style.setProperty('--sx', Math.random() < 0.5 ? '-1' : '1');
 }
 
+// pas sapi dipencet dia langsung pointer-events: none (fading), jadi event click
+// dari pointerup bisa jatuh ke tombol di bawahnya -> telan click itu sebentar
+let suppressClickUntil = 0;
+document.addEventListener(
+  'click',
+  (e) => {
+    if (performance.now() < suppressClickUntil) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  },
+  true
+);
+
 function spawnCows() {
   const field = $('#cow-field');
   field.innerHTML = '';
@@ -167,7 +181,10 @@ function spawnCows() {
     cow.style.setProperty('--delay', (i * 0.16).toFixed(2) + 's');
     placeCowRandom(cow);
 
-    cow.addEventListener('pointerdown', () => {
+    cow.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      suppressClickUntil = performance.now() + 600;
       if (cow.classList.contains('fading')) return;
 
       const moo = document.createElement('span');
