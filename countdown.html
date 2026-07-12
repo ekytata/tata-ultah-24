@@ -26,7 +26,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.6rem 1rem;
+  padding: 1.6rem 1rem 96px; /* ruang buat player bar di bawah */
 }
 
 @keyframes gradientShift {
@@ -141,6 +141,130 @@ h1 {
   opacity: 0.9;
 }
 
+/* ====== PLAYLIST BIGNA (sambil nunggu) ====== */
+.tracks-title {
+  margin: 1.6rem 0 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.tracks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.tracks li {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.tracks li:hover { border-color: #fff; }
+
+.tracks li.now {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: #fff;
+  font-weight: 600;
+}
+
+/* ====== PLAYER BAR ====== */
+.player {
+  position: fixed;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  width: min(480px, calc(100vw - 24px));
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 18px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+}
+
+.vinyl {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background:
+    radial-gradient(circle at center, #ff6fa5 0 17%, #201018 18% 30%, #3a2230 31% 33%, #201018 34% 46%, #3a2230 47% 49%, #201018 50% 100%);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  animation: spin 3.2s linear infinite;
+  animation-play-state: paused;
+}
+
+.player.playing .vinyl { animation-play-state: running; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.track-info { min-width: 0; flex: 1; text-align: left; }
+
+.track-info .name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-info .artist {
+  font-size: 0.68rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.progress {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 99px;
+  margin-top: 6px;
+  cursor: pointer;
+}
+
+.progress .fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #fff, #ffd166);
+}
+
+.play-btn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 1.05rem;
+  color: #6a1b4d;
+  background: linear-gradient(135deg, #fff, #ffe0ec);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease;
+}
+
+.play-btn:active { transform: scale(0.92); }
+
 @media (max-width: 480px) {
   .card { padding: 2rem 1.2rem; }
   .timer { gap: 0.5rem; }
@@ -165,13 +289,28 @@ h1 {
     <div class="unit"><b id="cd-s">--</b><span>DETIK</span></div>
   </div>
 
-  <p class="target">🗓️ 13 Juli 2026 • 00:00</p>
+  <p class="target">🗓️ 13 Juli 2026 • 00:00 WIB</p>
+
+  <p class="tracks-title">Sambil nunggu, dengerin bias-mu dulu 🎧</p>
+  <ul class="tracks" id="track-list"></ul>
+
   <p class="sign">— dari seseorang yang sayang kamu 💌</p>
 </main>
 
+<div class="player" id="player">
+  <div class="vinyl" aria-hidden="true"></div>
+  <div class="track-info">
+    <div class="name">Vancouver</div>
+    <div class="artist">Big Naughty · 빅나티</div>
+    <div class="progress" id="progress"><div class="fill" id="progress-fill"></div></div>
+  </div>
+  <button class="play-btn" id="play-btn" aria-label="Putar lagunya">▶</button>
+</div>
+
 <script>
 // samakan dengan gerbang waktu di index.html
-const TARGET = new Date('2026-07-13T00:00:00');
+// offset +07:00 = WIB, biar akurat walau zona waktu perangkat beda
+const TARGET = new Date('2026-07-13T00:00:00+07:00');
 
 const pad = (v) => String(v).padStart(2, '0');
 
@@ -189,6 +328,87 @@ function tick() {
 
 tick();
 setInterval(tick, 250);
+
+// ====== PLAYER + PLAYLIST BIGNA (sama kayak bigna.html) ======
+const TRACKS = [
+  { title: 'Vancouver', src: 'music/vancouver.mp3' },
+  { title: 'Vancouver 2', src: 'music/vancouver-2.mp3' },
+  { title: 'Frank Ocean', src: 'music/frank-ocean.mp3' },
+  { title: 'Lovey Dovey', src: 'music/lovey-dovey.mp3' },
+  { title: 'Music', src: 'music/music.mp3' },
+];
+let currentTrack = 0;
+
+const audio = new Audio(TRACKS[0].src);
+audio.preload = 'auto';
+
+const player = document.getElementById('player');
+const playBtn = document.getElementById('play-btn');
+const progress = document.getElementById('progress');
+const fill = document.getElementById('progress-fill');
+const trackName = document.querySelector('.track-info .name');
+const trackList = document.getElementById('track-list');
+
+const chipEls = TRACKS.map((t, i) => {
+  const li = document.createElement('li');
+  li.textContent = t.title;
+  li.addEventListener('click', () => playTrack(i));
+  trackList.appendChild(li);
+  return li;
+});
+
+function syncUI() {
+  const playing = !audio.paused;
+  playBtn.textContent = playing ? '⏸' : '▶';
+  playBtn.setAttribute('aria-label', playing ? 'Pause lagunya' : 'Putar lagunya');
+  player.classList.toggle('playing', playing);
+  trackName.textContent = TRACKS[currentTrack].title;
+  chipEls.forEach((el, i) => {
+    const now = i === currentTrack;
+    el.classList.toggle('now', now);
+    el.textContent = (now && playing ? '▶ ' : '') + TRACKS[i].title;
+  });
+}
+
+function playTrack(i) {
+  if (i === currentTrack && !audio.paused) return;
+  if (i !== currentTrack) {
+    currentTrack = i;
+    audio.src = TRACKS[i].src;
+    fill.style.width = '0%';
+  }
+  audio.play().catch(() => {});
+  syncUI();
+}
+
+// lagu habis -> lanjut ke track berikutnya (muter terus kayak playlist)
+audio.addEventListener('ended', () => playTrack((currentTrack + 1) % TRACKS.length));
+
+playBtn.addEventListener('click', () => {
+  if (audio.paused) audio.play().catch(() => {});
+  else audio.pause();
+});
+
+audio.addEventListener('play', syncUI);
+audio.addEventListener('pause', syncUI);
+audio.addEventListener('timeupdate', () => {
+  if (audio.duration) fill.style.width = (audio.currentTime / audio.duration) * 100 + '%';
+});
+
+progress.addEventListener('click', (e) => {
+  if (!audio.duration) return;
+  const r = progress.getBoundingClientRect();
+  audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+});
+
+// autoplay diblokir browser -> mulai di interaksi pertama
+function firstPlay() {
+  document.removeEventListener('pointerdown', firstPlay);
+  audio.play().catch(() => {});
+}
+document.addEventListener('pointerdown', firstPlay);
+audio.play().catch(() => {});
+syncUI();
 
 // hati-hati melayang
 const box = document.querySelector('.bg-hearts');
