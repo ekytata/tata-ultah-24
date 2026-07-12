@@ -7,7 +7,7 @@ const CONFIG = {
   pauseBetweenShots: 500, // jeda setelah flash sebelum lanjut (ms)
   photoWidth: 640,        // resolusi tiap foto di strip (4:3)
   photoHeight: 480,
-  fileName: 'photobooth-nurul-24',
+  fileName: 'photobooth-tata-24',
   jpgQuality: 0.92,
 
   layout: {
@@ -26,7 +26,7 @@ const CONFIG = {
   // teks di strip (gaya photobooth studio)
   brandTop: 'PHOTO',
   brandBottom: 'BOOTH',
-  dateText: '11.07.2026',
+  dateText: '13.07.2026',
   signature1: 'Happy Birthday Tata',
   signatureMid: 'by',
   signature2: 'Pacar Tata',
@@ -34,15 +34,15 @@ const CONFIG = {
   // GIF "live photo": ambil N detik terakhir sebelum tiap jepretan
   gif: {
     seconds: 5,
-    fps: 8,           // makin tinggi makin mulus
+    fps: 16,           // makin tinggi makin mulus
     frameW: 360,      // resolusi frame live yang direkam
     frameH: 270,
     stripWidth: 480,  // lebar GIF hasil (mengecil otomatis kalau strip terlalu tinggi)
-    quality: 6,       // gif.js: makin kecil makin bagus (tapi makin lambat)
+    quality: 4,       // gif.js: makin kecil makin bagus (tapi makin lambat)
     workers: 4,
     // batas biar aman dikirim ke WhatsApp (WA mengonversi GIF ke video):
     maxHeight: 1200,  // GIF terlalu tinggi bikin konversi WA gagal
-    maxFrames: 32,    // batasi durasi/ukuran file
+    maxFrames: 60,    // batasi durasi/ukuran file
     maxBytes: 14 * 1024 * 1024 // lewat ini -> kompres ulang otomatis
   },
 
