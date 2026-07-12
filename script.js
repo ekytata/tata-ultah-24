@@ -65,7 +65,7 @@ function attachTilt(el, maxTilt = 12) {
 }
 
 function burstAt(x, y, count = 30) {
-  const emojis = ['💖', '💕', '💗', '✨', '🎉', '🌸'];
+  const emojis = ['💖', '💕', '💗', '✨', '🎉', '🌸', '🦒'];
   for (let i = 0; i < count; i++) {
     const el = document.createElement('span');
     el.className = 'burst-particle';
@@ -85,8 +85,8 @@ function burstAt(x, y, count = 30) {
 }
 
 const AMBIENT_GLYPHS = {
-  love: ['💗', '💕', '✨', '💫'],
-  fire: ['🔥', '🔥', '🔥', '💢'],
+  love: ['💗', '💕', '✨', '💫', '🦒'],
+  fire: ['🔥', '🔥', '🔥', '💢', '🐮'],
 };
 
 function spawnAmbientHearts(count = 25) {
