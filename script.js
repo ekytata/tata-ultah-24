@@ -1,43 +1,19 @@
 // ====== CONFIG (edit these freely) ======
 const CONFIG = {
-  PASSWORD: 'nurul24', // hint shown on screen: nama depan + umur, tanpa spasi
+  PASSWORD: '28102025',
 };
 
-// foto: images/gallery-1.jpeg s/d gallery-17.jpeg (urutan caption mengikuti nomor foto)
-const GALLERY_CAPTIONS = [
-  'Awal dari segalanya 💘',
-  'Senyum yang bikin aku jatuh cinta tiap hari 😍',
-  'Berdua aja udah cukup ✨',
-  'Partner makan enak nomor satu 🍜',
-  'Yang paling gemesin sedunia 🥹',
-  'Jalan kaki pun jadi romantis kalau sama kamu 🚶‍♀️🚶',
-  'Ketawa kamu = mood booster aku 😂',
-  'Foto random tapi tetep cakep 📷',
-  'Bareng kamu, waktu suka lupa jalan ⏳',
-  'My favorite view 🌇',
-  'Si paling fotogenic 💅',
-  'Momen kecil yang gak pernah aku lupa 🤍',
-  'Sama kamu semua tempat jadi indah 🌸',
-  'Ini pas kamu lucu banget (kayak biasanya) 😝',
-  'Definisi rumah: kamu 🏡',
-  'Cantiknya konsisten dari dulu ✨',
-  'Dan masih banyak momen yang nunggu kita 💌',
-];
-
-const GALLERY_DATA = GALLERY_CAPTIONS.map((caption, i) => ({
-  src: `images/gallery-${i + 1}.jpeg`,
-  caption,
-}));
+// foto momen sekarang ada di momen.html + momen.js (dipisah biar halaman ini ringan)
 
 const MESSAGES = [
-  'Selamat ulang tahun, Nurul Sasmitha 🎂',
+  'Selamat ulang tahun, Tatacuu 🎂',
   'Hari ini kamu resmi genap 24 tahun 🎉',
-  '24 tahun isinya cerita, tawa, dan proses jadi kamu yang sekarang ✨',
-  'Makasih ya udah selalu ada, jadi tempat paling nyaman buat pulang 🤍',
-  'Semoga semua mimpi kamu pelan-pelan jadi kenyataan 🌷',
-  'Sehat-sehat, bahagia terus, dan jangan lupa senyum tiap hari 😄',
-  'Aku janji bakal terus ada, buat rayain setiap tahun bareng kamu 💍',
-  'I love you so much, happy birthday, sayangku 💖',
+  'Selamat sudah bisa bertahan di dunia ini selama 24 tahun 🥰',
+  'Terima kasih sudah selalu ada, jadi tempat paling nyaman buat pulang 🤍',
+  'Semoga apa yang kamu mimpikan pelan-pelan bisa jadi kenyataan 🌷',
+  'Sehat-sehat terus yahh tatacuu, bahagia terus 💖',
+  'Bismillah yok bisa yok tahun depan ultah sdh tinggal serumah 😆',
+  'love you so much, happy birthday, sayangku 💖',
 ];
 
 const FLEE_LINES = [
@@ -67,11 +43,6 @@ const $ = (sel, ctx = document) => ctx.querySelector(sel);
 function showSection(id) {
   document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
   $('#' + id).classList.add('active');
-  // kolase background cuma tampil di halaman memories
-  const isGallery = id === 'screen-gallery';
-  $('#gallery-bg').classList.toggle('show', isGallery);
-  if (isGallery && galleryIdleStart) galleryIdleStart();
-  if (!isGallery && galleryIdleStop) galleryIdleStop();
 }
 
 const FINE_POINTER = window.matchMedia('(pointer: fine)').matches;
@@ -157,6 +128,7 @@ function initPasswordScreen() {
     e.preventDefault();
     const val = input.value.trim().toLowerCase();
     if (val === CONFIG.PASSWORD) {
+      sessionStorage.setItem('ultah-unlocked', '1'); // dipakai momen.html buat jaga gerbang
       showSection('screen-question');
     } else {
       card.classList.remove('shake');
@@ -252,6 +224,7 @@ function initQuestionScreen() {
       setTimeout(() => {
         spawnCows();
         setAmbientMood('fire');
+        if (window.MusicPlayer) window.MusicPlayer.setTrack('music/phonk.mp3'); // mode ngambek -> phonk
         showSection('screen-ngambek');
       }, 700);
     }
@@ -322,7 +295,7 @@ function initQuestionScreen() {
   btnYes.addEventListener('click', () => {
     const rect = btnYes.getBoundingClientRect();
     burstAt(rect.left + rect.width / 2, rect.top + rect.height / 2, 34);
-    setTimeout(() => showSection('screen-gallery'), 500);
+    setTimeout(() => { location.href = 'momen.html'; }, 500);
   });
 
 }
@@ -411,136 +384,8 @@ function initMemoryGame() {
     burstAt(e.clientX || window.innerWidth / 2, e.clientY || window.innerHeight / 2, 26);
     if (resetQuestionState) resetQuestionState();
     setAmbientMood('love');
+    if (window.MusicPlayer) window.MusicPlayer.setTrack('music/birthday.mp3'); // udah dimaafin -> balik ke lagu ultah
     setTimeout(() => showSection('screen-question'), 350);
-  });
-}
-
-// ====== GALLERY BACKGROUND COLLAGE ======
-const BG_DARK_GRADIENTS = [
-  'linear-gradient(135deg,#5f2c82,#af4261)',
-  'linear-gradient(135deg,#2b5876,#4e4376)',
-  'linear-gradient(135deg,#c33764,#5b2c6f)',
-];
-
-const BG_WORDS = ['Love ♡', 'Memories', 'Us ✨', 'Forever', 'Sayang', 'Happy 24th', 'N ♡ S', 'Celebrate Love'];
-
-function buildGalleryBackground() {
-  const track = $('#gallery-bg-track');
-  const colWidths = [210, 170, 250, 190, 230, 180];
-  const targetWidth = Math.max(window.innerWidth, 900) * 1.3;
-
-  // urutan foto dikocok sekali, lalu dipakai bergilir biar semua 17 foto kebagian
-  const photoOrder = GALLERY_DATA.map((g) => g.src).sort(() => Math.random() - 0.5);
-  let photoIdx = 0;
-
-  const cols = [];
-  let width = 0;
-  let wordIdx = 0;
-
-  for (let i = 0; width < targetWidth || i < 8; i++) {
-    const w = colWidths[i % colWidths.length];
-    width += w + 6; // + margin antar kolom
-    const col = document.createElement('div');
-    col.className = 'bg-col';
-    col.style.width = w + 'px';
-
-    const tiles = 2 + (i % 2); // selang-seling 2-3 tile per kolom
-    for (let t = 0; t < tiles; t++) {
-      const tile = document.createElement('div');
-      const isWord = Math.random() < 0.2;
-      tile.className = 'bg-tile' + (isWord ? ' word' : ' photo');
-      tile.style.flexGrow = (0.7 + Math.random()).toFixed(2);
-      if (isWord) {
-        tile.style.background = BG_DARK_GRADIENTS[Math.floor(Math.random() * BG_DARK_GRADIENTS.length)];
-        tile.textContent = BG_WORDS[wordIdx++ % BG_WORDS.length];
-      } else {
-        tile.style.backgroundImage = `url(${photoOrder[photoIdx++ % photoOrder.length]})`;
-      }
-      col.appendChild(tile);
-    }
-    cols.push(col);
-  }
-
-  // dua salinan identik berdampingan -> geser 50% = loop mulus tanpa "lompatan"
-  cols.forEach((c) => track.appendChild(c));
-  cols.forEach((c) => track.appendChild(c.cloneNode(true)));
-
-  track.style.setProperty('--slide-dur', Math.round(width / 22) + 's'); // ~22px per detik
-}
-
-// ====== GALLERY IDLE MODE (3 detik tanpa klik -> konten fadeout, tinggal kolase) ======
-const GALLERY_IDLE_MS = 3000;
-let galleryIdleStart = null; // dipanggil showSection saat masuk gallery
-let galleryIdleStop = null;  // dipanggil showSection saat keluar gallery
-
-function initGalleryIdleMode() {
-  const section = $('#screen-gallery');
-  const bg = $('#gallery-bg');
-  let timer = null;
-  let hidden = false;
-
-  function hideContent() {
-    hidden = true;
-    section.classList.add('idle');
-    bg.classList.add('ambient');
-  }
-
-  function showContent() {
-    hidden = false;
-    section.classList.remove('idle');
-    bg.classList.remove('ambient');
-  }
-
-  function armTimer() {
-    clearTimeout(timer);
-    timer = setTimeout(hideContent, GALLERY_IDLE_MS);
-  }
-
-  galleryIdleStart = () => {
-    showContent();
-    armTimer();
-  };
-
-  galleryIdleStop = () => {
-    clearTimeout(timer);
-    showContent();
-  };
-
-  // klik/tap di mana saja: munculin konten lagi (kalau lagi sembunyi) + reset hitungan
-  section.addEventListener('pointerdown', () => {
-    if (!section.classList.contains('active')) return;
-    if (hidden) showContent();
-    armTimer();
-  });
-
-  // lagi scroll foto = lagi aktif; jangan fadeout di tengah scroll
-  section.addEventListener(
-    'scroll',
-    () => {
-      if (!section.classList.contains('active') || hidden) return;
-      armTimer();
-    },
-    { passive: true }
-  );
-}
-
-// ====== GALLERY SCREEN ======
-function initGalleryScreen() {
-  const grid = $('#gallery-grid');
-  GALLERY_DATA.forEach((item, i) => {
-    const card = document.createElement('div');
-    card.className = 'polaroid';
-    card.innerHTML = `
-      <div class="gallery-photo"><img src="${item.src}" alt="momen kita ${i + 1}" loading="lazy" draggable="false"></div>
-      <p class="caption">${item.caption}</p>
-    `;
-    grid.appendChild(card);
-    attachTilt(card, 8);
-  });
-
-  $('#btn-to-messages').addEventListener('click', () => {
-    showSection('screen-messages');
-    startMessages();
   });
 }
 
@@ -574,7 +419,10 @@ function startMessages() {
 }
 
 function initReplay() {
-  $('#btn-replay').addEventListener('click', () => window.location.reload());
+  // buang hash #ucapan biar reload-nya beneran mulai dari awal (halaman password)
+  $('#btn-replay').addEventListener('click', () => {
+    window.location.href = window.location.pathname;
+  });
 }
 
 // ====== THREE.JS 3D BACKGROUND (progressive enhancement) ======
@@ -686,7 +534,6 @@ function initBackground3D() {
 // ====== INIT ======
 document.addEventListener('DOMContentLoaded', () => {
   spawnAmbientHearts(22);
-  buildGalleryBackground();
   attachTilt($('#password-card'), 10);
   attachTilt($('#question-card'), 10);
   attachTilt($('#ngambek-card'), 10);
@@ -695,9 +542,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initPasswordScreen();
   initQuestionScreen();
   initMemoryGame();
-  initGalleryScreen();
-  initGalleryIdleMode();
   initReplay();
+
+  // balik dari momen.html ("Lanjut ke ucapan →") langsung ke halaman ucapan,
+  // tapi cuma kalau sudah pernah lewat gerbang password
+  if (location.hash === '#ucapan' && sessionStorage.getItem('ultah-unlocked') === '1') {
+    showSection('screen-messages');
+    startMessages();
+  }
 
   try {
     initBackground3D();

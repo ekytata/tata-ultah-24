@@ -7,11 +7,11 @@
 // gerbang waktu: sebelum 13 Juli 2026 00:00 langsung dilempar ke countdown,
 // dijalankan paling awal supaya isi halaman tidak sempat dirender sama sekali.
 // (samakan tanggalnya dengan TARGET di countdown.html)
-(function () {
-  if (new Date() < new Date('2026-07-13T00:00:00')) {
-    location.replace('countdown.html');
-  }
-})();
+// (function () {
+//   if (new Date() < new Date('2026-07-13T00:00:00')) {
+//     location.replace('countdown.html');
+//   }
+// })();
 </script>
 <title>Happy Birthday Nurul Sasmitha 🎂</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9D%A4%EF%B8%8F</text></svg>">
@@ -23,10 +23,6 @@
 <body>
 
   <div id="bg-scene"></div>
-  <div id="gallery-bg" aria-hidden="true">
-    <div class="gallery-bg-track" id="gallery-bg-track"></div>
-    <div class="gallery-bg-scrim"></div>
-  </div>
   <div id="floating-hearts"></div>
 
   <main id="app">
@@ -41,7 +37,7 @@
           <input type="password" id="password-input" placeholder="Masukkan kata sandi..." autocomplete="off" autofocus>
           <button type="submit" class="btn btn-yes">Buka 🔓</button>
         </form>
-        <p class="hint">Hint: nama depan kamu + umur kamu sekarang, tanpa spasi 😉</p>
+        <p class="hint">Hint: tanya pacarmu 😚</p>
         <p class="error-msg" id="password-error">Kata sandinya salah tuh, coba lagi dong~ 🥺</p>
       </div>
     </section>
@@ -89,16 +85,7 @@
       </div>
     </section>
 
-    <!-- 3. GALLERY -->
-    <section id="screen-gallery" class="screen">
-      <div class="gallery-wrap">
-        <h2 class="script-title">Kumpulan Momen Kita 📸</h2>
-        <p class="subtitle center">Scroll pelan-pelan ya... tiap foto ada ceritanya 🥰</p>
-        <div class="gallery-grid" id="gallery-grid"></div>
-        <button class="btn btn-next" id="btn-to-messages">Lanjut ke ucapan →</button>
-      </div>
-      <p class="idle-hint">✨ ketuk layar buat munculin lagi fotonya ✨</p>
-    </section>
+    <!-- 3. GALLERY: dipisah ke momen.html biar halaman ini gak ikut ngunduh semua foto -->
 
     <!-- 4. MESSAGES -->
     <section id="screen-messages" class="screen">
@@ -106,8 +93,8 @@
         <div id="message-lines"></div>
         <div id="finale" class="finale hidden">
           <h1 class="finale-title">Happy 24th Birthday</h1>
-          <h2 class="finale-name">Nurul Sasmitha 🎂🎉</h2>
-          <p class="finale-sign">Dari Sallie, yang sayang kamu selalu 💌</p>
+          <h2 class="finale-name">Tatacuu 🎂🎉</h2>
+          <p class="finale-sign">Dari Pacarmu yang paling keren 💌😎</p>
           <a class="btn btn-yes" id="btn-photobooth" href="photobooth.html">Take Photobooth 📸</a>
           <button class="btn btn-replay" id="btn-replay">Ulangi lagi dari awal ↺</button>
         </div>
@@ -117,6 +104,7 @@
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="music.js" defer></script>
   <script src="script.js" defer></script>
 </body>
 </html>

@@ -825,3 +825,33 @@ a.btn {
   .gallery-grid { grid-template-columns: 1fr; }
   .polaroid .caption { font-size: 1.05rem; }
 }
+
+/* ====== MUSIC TOGGLE ====== */
+#music-toggle {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 50;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--pink), var(--pink-soft));
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#music-toggle:hover {
+  transform: scale(1.1);
+}
+
+#music-toggle.playing {
+  animation: musicPulse 2s ease infinite;
+}
+
+@keyframes musicPulse {
+  0%, 100% { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); }
+  50% { box-shadow: 0 6px 24px rgba(255, 111, 165, 0.75); }
+}
